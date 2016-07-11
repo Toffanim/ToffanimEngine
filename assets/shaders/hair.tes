@@ -1,0 +1,11 @@
+#version 410 core
+ 
+layout(isolines, equal_spacing) in;
+uniform mat4 MVP;
+
+ 
+void main()
+{
+    int idx = gl_TexCo; 
+    gl_Position = vec4(0.0,0.0,0.0,1.0);
+}

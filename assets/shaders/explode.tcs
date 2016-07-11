@@ -1,0 +1,35 @@
+#version 430 core
+
+layout (vertices = 3) out;
+
+in block
+{
+	vec2 Texcoord;
+	vec3 Position;
+	vec3 Normal;
+} gs_in[]; 
+
+out block
+{
+	vec2 Texcoord;
+	vec3 Position;
+	vec3 Normal;
+} gs_out[]; 
+
+void main(void)
+{
+    gs_out[gl_InvocationID].Texcoord = gs_in[gl_InvocationID].Texcoord;
+	gs_out[gl_InvocationID].Position = gs_in[gl_InvocationID].Position;
+	gs_out[gl_InvocationID].Normal = gs_in[gl_InvocationID].Normal;
+	
+    if (gl_InvocationID == 0)
+    {
+        gl_TessLevelInner[0] = 10.0;
+        gl_TessLevelOuter[0] = 16.0;
+        gl_TessLevelOuter[1] = 16.0;
+        gl_TessLevelOuter[2] = 16.0;
+    }
+
+    gl_out[gl_InvocationID].gl_Position =
+        gl_in[gl_InvocationID].gl_Position;
+}
