@@ -15,5 +15,6 @@ $Notice: $
 #include "component.h"
 #include "Initialisation.h"
 #include "sprite.h"
+#include "fbo.h"
 
 #endif

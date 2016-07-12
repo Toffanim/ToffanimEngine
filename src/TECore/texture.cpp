@@ -6,9 +6,15 @@ namespace TE
 	namespace Core
 	{
 
-		texture2D::texture2D(std::string Path, std::string Name) : 
+		texture2D::texture2D(std::string Path, std::string Name, 
+			base_internal_format BaseInternalFormat, 
+			sized_internal_format SizedInternalFormat,
+			data_type DataType) : 
 			_Path(Path),
-			_Name(Name)
+			_Name(Name),
+			_DataType(DataType),
+			_SizedInternalFormat(SizedInternalFormat),
+			_BaseInternalFormat(BaseInternalFormat)
 		{
 			int comp;
 			_RawData = stbi_load(_Path.c_str(), &_Width, &_Height, &comp, 3);
@@ -16,7 +22,25 @@ namespace TE
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, _ID);	
 			//IMPORTANT(Marc) : Ajout du param pour choisir le format interne
-			CreateTexture(_ID, GL_SRGB8, GL_RGB, GL_UNSIGNED_BYTE, _Width, _Height, _RawData);
+			CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height, _RawData);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		texture2D::texture2D(unsigned int Width, unsigned int Height,
+			base_internal_format BaseInternalFormat,
+			sized_internal_format SizedInternalFormat,
+			data_type DataType) :
+			_Path(std::string()),
+			_Name(std::string()),
+			_DataType(DataType),
+			_SizedInternalFormat(SizedInternalFormat),
+			_BaseInternalFormat(BaseInternalFormat)
+		{
+			glGenTextures(1, &_ID);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, _ID);
+			//IMPORTANT(Marc) : Ajout du param pour choisir le format interne
+			CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 

@@ -21,8 +21,9 @@ using namespace std;
 int main(int argc, char** argv)
 {
 	TE::TE_Init();
-
-	TE::Core::window Window(720, 480, "New Window");
+	const int ScreenWidth = 720;
+	const int ScreenHeight = 480;
+	TE::Core::window Window(ScreenWidth, ScreenHeight, "New Window");
 	Window.MakeCurrent();
 
 	TE::Renderer::camera_actor Camera;
@@ -49,10 +50,26 @@ int main(int argc, char** argv)
 	TE::Core::texture2D Test("../assets/textures/final.png");
 
 	//Shaders
-	TE::Renderer::shader BlitShader("RandomName");
-	BlitShader.Attach(GL_VERTEX_SHADER, "../assets/shaders/blit.vert");
-	BlitShader.Attach(GL_FRAGMENT_SHADER, "../assets/shaders/blit.frag");
+	TE::Renderer::shader BlitShader("Blit");
+	BlitShader.Attach(TE::Renderer::shader::type::VERTEX, "../assets/shaders/blit.vert");
+	BlitShader.Attach(TE::Renderer::shader::type::FRAGMENT, "../assets/shaders/blit.frag");
 	BlitShader.Link();
+
+	TE::Renderer::shader GBufferShader("GBuffer");
+	GBufferShader.Attach(TE::Renderer::shader::type::VERTEX, "../assets/shaders/gbuffer.vert");
+	GBufferShader.Attach(TE::Renderer::shader::type::FRAGMENT, "../assets/shaders/gbuffer.frag");
+	GBufferShader.Link();
+
+	TE::Core::fbo GBufferFBO(ScreenWidth, ScreenHeight);
+	GBufferFBO.AddDrawBuffer(TE::Core::fbo::attachment::COLOR0,
+		TE::Core::texture2D::base_internal_format::RGBA,
+		TE::Core::texture2D::sized_internal_format::RGBA32F,
+		TE::Core::texture2D::data_type::FLOAT);
+	GBufferFBO.AddDrawBuffer(TE::Core::fbo::attachment::COLOR1,
+		TE::Core::texture2D::base_internal_format::RGBA,
+		TE::Core::texture2D::sized_internal_format::RGBA32F,
+		TE::Core::texture2D::data_type::FLOAT);
+	GBufferFBO.AddDepthBuffer(TE::Core::texture2D::sized_internal_format::DEPTH_COMPONENT24);
 
 	glEnable(GL_DEPTH_TEST);
 

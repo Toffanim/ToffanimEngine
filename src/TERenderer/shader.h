@@ -27,10 +27,17 @@ namespace TE
 		class shader
 		{
 		public:
+
+			enum type
+			{
+				VERTEX = GL_VERTEX_SHADER,
+				FRAGMENT = GL_FRAGMENT_SHADER,
+			};
+
 			shader(std::string Name);
 			~shader();
 			void Attach(GLuint Shader);
-			void Attach(int Type, const char* Filename);
+			void Attach(type Type, const char* Filename);
 			void Link();
 			void Unuse() const;
 			GLuint GetProgram() const { return(_ProgramHandle); }

@@ -76,7 +76,9 @@ OPTION ( ASSIMP_BUILD_TESTS
 )
 add_subdirectory(lib/assimp)
 set_property(TARGET assimp PROPERTY FOLDER ASSIMP)
+if(zlibstatic)
 set_property(TARGET zlibstatic PROPERTY FOLDER ASSIMP)
+endif()
 set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER ASSIMP)
 target_link_libraries(engine assimp)
 

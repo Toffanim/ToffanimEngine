@@ -43,7 +43,7 @@ namespace TE
 			_Handles.push_back(Shader);
 		}
 
-		void shader::Attach(int Type, const char* Filename)
+		void shader::Attach(type Type, const char* Filename)
 		{
 			auto Mem = ReadFile(Filename);
 			auto Handle = glCreateShader(Type);
