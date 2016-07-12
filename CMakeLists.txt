@@ -1,21 +1,43 @@
 cmake_minimum_required(VERSION 2.8)
 project (ToffanimEngine)
+
+function(assign_source_group)
+    foreach(_source IN ITEMS ${ARGN})
+        if (IS_ABSOLUTE "${_source}")
+            file(RELATIVE_PATH _source_rel "${CMAKE_CURRENT_SOURCE_DIR}" "${_source}")
+        else()
+            set(_source_rel "${_source}")
+        endif()
+        get_filename_component(_source_path "${_source_rel}" PATH)
+        string(REPLACE "/" "\\" _source_path_msvc "${_source_path}")
+        source_group("${_source_path_msvc}" FILES "${_source}")
+    endforeach()
+endfunction(assign_source_group)
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 
-file(GLOB MAIN_INCLUDE
-       "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-       "${CMAKE_CURRENT_SOURCE_DIR}/src/TECore/*.cpp"
-       "${CMAKE_CURRENT_SOURCE_DIR}/src/TERenderer/*.cpp"
-	   "${CMAKE_CURRENT_SOURCE_DIR}/src/TEPhysics/*.cpp"
-	  "${CMAKE_CURRENT_SOURCE_DIR}/src/TEGame/*.cpp"
-	   "${CMAKE_CURRENT_SOURCE_DIR}/src/TEEditor/*.cpp"
-	   "${CMAKE_CURRENT_SOURCE_DIR}/src/main/*.cpp"
-	   "${CMAKE_CURRENT_SOURCE_DIR}/src/utils/*.cpp"
+file(GLOB MAIN_INCLUDE RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}"
+       "src/*.cpp"
+	   "src/*.h"
+       "src/TECore/*.cpp"
+	   "src/TECore/*.h"
+       "src/TERenderer/*.cpp"
+	   "src/TERenderer/*.h"
+	   "src/TEPhysics/*.cpp"
+	   "src/TEPhysics/*.h"
+	   "src/TEGame/*.cpp"
+	   "src/TEGame/*.h"
+	   "src/TEEditor/*.cpp"
+	   "src/TEEditor/*.h"
+	   "src/main/*.cpp"
+	   "src/main/*.h"
+	   "src/utils/*.cpp"
+	   "src/utils/*.h"
 	   )
 	   
 add_executable(engine ${MAIN_INCLUDE})
-
+assign_source_group(${MAIN_INCLUDE})
 #GLFW
 if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/CMakeLists.txt")
     # Could not find GLFW
