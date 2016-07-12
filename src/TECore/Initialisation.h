@@ -9,7 +9,7 @@ $Notice: $
 #define INITIALISATION_H
 
 //NOTE(Marc) : Always call glew before any openGL context creation (GLFW, SDL, etc...)
-#include "glew/glew.h"
+#include "GL/glew.h"
 
 #define USE_GLFW
 

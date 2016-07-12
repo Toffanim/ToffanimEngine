@@ -1,4 +1,10 @@
-# SyntheseDemo
+# TOFFANIM ENGINE
+
+#HOW TO BUILD
+(Tested only on windows for now)
+cd build/
+cmake ..
+execute build/ToffanimEngine.sln
 
 TODO :
 - add opti deferred (compressed normals + AABB light volume rasterizing )

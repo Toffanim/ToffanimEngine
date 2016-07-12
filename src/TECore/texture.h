@@ -10,8 +10,8 @@ $Notice: $
 #define TEXTURE_H
 
 #include <string>
-#include <glew/glew.h>
-#include "stb/stb_image.h"
+#include <GL/glew.h>
+#include "stb_image.h"
 
 namespace TE
 {

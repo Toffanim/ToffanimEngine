@@ -14,7 +14,7 @@
 #include <sstream>
 #include <string>
 #include <map>
-#include <glew/glew.h>
+#include <GL/glew.h>
 #include "../utils/Utils.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
