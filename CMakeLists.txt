@@ -17,7 +17,7 @@ file(GLOB MAIN_INCLUDE
 add_executable(engine ${MAIN_INCLUDE})
 
 #GLFW
-if( NOT EXISTS "/lib/glfw/CMakeLists.txt")
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/CMakeLists.txt")
     # Could not find GLFW
     message("Unable to find GLFW")
 	# Clone the submodule
@@ -35,7 +35,7 @@ set_property(TARGET glfw PROPERTY FOLDER GLFW)
 target_link_libraries(engine glfw)
 
 #Assimp
-if( NOT EXISTS "/lib/assimp/CMakeLists.txt")
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp/CMakeLists.txt")
     # Could not find ASSIMP
     message("Unable to find ASSIMP")
 	# Clone the submodule
@@ -59,7 +59,7 @@ set_property(TARGET UpdateAssimpLibsDebugSymbolsAndDLLs PROPERTY FOLDER ASSIMP)
 target_link_libraries(engine assimp)
 
 #GLM
-if( NOT EXISTS "/lib/glm/CMakeLists.txt")
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/glm/CMakeLists.txt")
     # Could not find ASSIMP
     message("Unable to find GLM")
 	# Clone the submodule
@@ -71,7 +71,7 @@ endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/glm")
 
 #IMGUI
-if( NOT EXISTS "/lib/imgui")
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui")
     # Could not find ASSIMP
     message("Unable to find IMGUI")
 	# Clone the submodule
@@ -84,7 +84,7 @@ include_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui")
 
 
 #STB
-if( NOT EXISTS "/lib/stb")
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/stb")
     # Could not find ASSIMP
     message("Unable to find STB")
 	# Clone the submodule

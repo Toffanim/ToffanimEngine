@@ -1,7 +1,0 @@
-#!/bin/bash
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )/bin/debug"
-export LD_LIBRARY_PATH=bin/debug:$LD_LIBRARY_PATH
-
-./build/premake4.linux gmake
-make && ./demo_d

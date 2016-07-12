@@ -2,9 +2,9 @@
 
 #HOW TO BUILD
 (Tested only on windows for now)
-cd build/
-cmake ..
-execute build/ToffanimEngine.sln
+- mkdir build && cd build/
+- cmake ..  [-G Visual Studio 12 2013 Win64]
+- then execute build/ToffanimEngine.sln with visual studio
 
 TODO :
 - add opti deferred (compressed normals + AABB light volume rasterizing )
@@ -15,10 +15,6 @@ TODO :
 - PostFX : lens flare
 - clean particle code to do clean particle generation and rendering
 - terrain tesselation
-- create TRON/TRINE assets/scene (take all assets that we cn from UE/cryEngine/Nvidia demos)
-- add sound reads
-- menu to play/pause the demo ?
-- introduction with names fading, etc ?
 
 DONE :
 - sun added

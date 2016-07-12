@@ -2,7 +2,9 @@
 ## Project
 #################
 
-lib/
+build/
+lib/*
+!lib/glew
 SavePremake/
 
 #################
