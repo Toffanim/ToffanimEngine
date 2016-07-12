@@ -6,6 +6,14 @@
 - cmake ..  [-G Visual Studio 12 2013 Win64]
 - then execute build/ToffanimEngine.sln with visual studio
 
+/!\ IMPORTANT /!\ If the build fails, it is surely because you don't have "git" in your PATH variable,
+so you may have to update the submodules by hand with :
+git submodule update --init -- lib/glm
+git submodule update --init -- lib/glfw
+git submodule update --init -- lib/assimp
+git submodule update --init -- lib/imgui
+git submodule update --init -- lib/stb
+
 TODO :
 - add opti deferred (compressed normals + AABB light volume rasterizing )
 - improve shadows (soft shadow (PCSS) and CSM )
