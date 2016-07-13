@@ -10,11 +10,28 @@ $Notice: $
 #define CAMERA_ACTOR_H
 
 #include "../TECore/actor.h"
+#include <stdlib.h>
+#include <iostream>
 
 namespace TE
 {
 	namespace Renderer
 	{
+		enum projection_type
+		{
+			PERSPECTIVE,
+			ORTHOGRAPHIC,
+		};
+
+		struct camera_properties
+		{
+			projection_type ProjectionType = PERSPECTIVE;
+			float MinDist = 0.1f;
+			float MaxDist = 100.f;
+			float Zoom = 45.f;
+			float AspectRatio = 1.f;
+		};
+
 		class camera_actor : public Core::actor
 		{
 		public:
@@ -25,9 +42,14 @@ namespace TE
 			void BeginTick() override {};
 			void Tick() override {};
 
+			void SetCameraProperty(camera_properties Properties);
 			Math::mat4f GetView();
+			Math::mat4f GetProjection();
+
+			void SetProjectionType(projection_type Type);
 
 		private:
+			camera_properties _Properties;
 			//Math::axis3 _Axis;
 			//Math::rotation _Rotation;
 		};

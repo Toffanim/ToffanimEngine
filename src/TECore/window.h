@@ -12,7 +12,7 @@ $Notice: $
 #include "GLFW/glfw3.h"
 #include <stdlib.h>
 #include <iostream>
-
+#include "../utils/Utils.h"
 namespace TE
 {
 	namespace Core

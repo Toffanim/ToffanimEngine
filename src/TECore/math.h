@@ -46,9 +46,9 @@ namespace TE
 
 		struct axis3
 		{
-			vec3f Up;
-			vec3f Right;
-			vec3f Front;
+			vec3f Up = vec3f(0.f, 1.f, 0.f);
+			vec3f Right = vec3f(1.f, 0.f, 0.f);
+			vec3f Front = vec3f(0.f, 0.f, -1.f);;
 		};
 	}
 }

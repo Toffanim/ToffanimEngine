@@ -53,11 +53,11 @@ void main()
 		n = -n;
 		
 		
-	//vec3 diffuseColor = mix( Material.BaseColor, texture(Material.Texture, In.Texcoord).rgb, Material.HasTexture);
-	vec3 diffuseColor = Material.BaseColor;
+	vec3 diffuseColor = mix( Material.BaseColor, texture(Material.Texture, In.Texcoord).rgb, Material.HasTexture);
+	//vec3 diffuseColor = Material.BaseColor;
 	Color = vec4(diffuseColor, 1.f);
 	NormalAndMaterials = vec4(EncodeNormal(n), Material.Metalness, Material.Roughness);
 	
-	//Color = vec4( 1.f);
+	//Color = vec4( 0.f);
 	//NormalAndMaterials = vec4( n, 1.f);
 }

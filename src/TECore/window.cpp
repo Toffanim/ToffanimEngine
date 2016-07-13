@@ -38,6 +38,7 @@ namespace TE
 			{
 				std::cout << "Failed to initialize GLEW" << std::endl;
 			}
+			Utils::checkGlError("GLEW INIT (Safe To Ignore)");
 		}
 
 		void window::SetVerticalSync(bool B)

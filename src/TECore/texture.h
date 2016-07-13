@@ -10,6 +10,7 @@ $Notice: $
 #define TEXTURE_H
 
 #include <string>
+#include <iostream>
 #include <GL/glew.h>
 #include "stb_image.h"
 

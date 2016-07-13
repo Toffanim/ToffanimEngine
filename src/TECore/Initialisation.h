@@ -19,6 +19,7 @@ $Notice: $
 
 #include <stdlib.h>
 #include <iostream>
+#include "../utils/Utils.h"
 
 namespace TE
 {
@@ -46,7 +47,6 @@ namespace TE
 		GLFWwindow* tmp = glfwCreateWindow(1, 1, "", NULL, NULL);
 		glfwMakeContextCurrent(tmp);
         #endif
-
 		
 		//NOTE(Marc) : Don't forget to fully create context before initializing GLEW
 		glewExperimental = GL_TRUE;
@@ -55,13 +55,13 @@ namespace TE
 			std::cout << "Failed to initialize GLEW" << std::endl;
 			return;
 		}
-		
+
+		Utils::checkGlError("GLEW INIT (Safe To Ignore)");
 		// print diagnostic information
 		printf("    GL VENDOR: %s\n", glGetString(GL_VENDOR));
 		printf("      VERSION: %s\n", glGetString(GL_VERSION));
 		printf("     RENDERER: %s\n", glGetString(GL_RENDERER));
 		printf("GLSL VERSION : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
-
 		// test if we've got GL 3.0 and forward (We need at least > 2.0)
 		if (!GLEW_VERSION_3_0)
 		{
@@ -69,8 +69,9 @@ namespace TE
 				"Please update your drivers and/or buy a better graphics card."
 				);
 		}
-
+		glfwMakeContextCurrent(NULL);
 		glfwDestroyWindow(tmp);
+		Utils::checkGlError("Destroy Window");
 	}
 }
 

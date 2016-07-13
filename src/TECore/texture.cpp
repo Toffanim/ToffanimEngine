@@ -14,16 +14,24 @@ namespace TE
 			_Name(Name),
 			_DataType(DataType),
 			_SizedInternalFormat(SizedInternalFormat),
-			_BaseInternalFormat(BaseInternalFormat)
+			_BaseInternalFormat(BaseInternalFormat),
+			_RawData(nullptr)
 		{
 			int comp;
 			_RawData = stbi_load(_Path.c_str(), &_Width, &_Height, &comp, 3);
-			glGenTextures(1, &_ID);
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, _ID);	
-			//IMPORTANT(Marc) : Ajout du param pour choisir le format interne
-			CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height, _RawData);
-			glBindTexture(GL_TEXTURE_2D, 0);
+			if (_RawData)
+			{
+				glGenTextures(1, &_ID);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, _ID);
+				//IMPORTANT(Marc) : Ajout du param pour choisir le format interne
+				CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height, _RawData);
+				glBindTexture(GL_TEXTURE_2D, 0);
+			}
+			else
+			{
+				std::cerr << "Error loading texture file" << std::endl;
+			}
 		}
 
 		texture2D::texture2D(unsigned int Width, unsigned int Height,
@@ -34,7 +42,10 @@ namespace TE
 			_Name(std::string()),
 			_DataType(DataType),
 			_SizedInternalFormat(SizedInternalFormat),
-			_BaseInternalFormat(BaseInternalFormat)
+			_BaseInternalFormat(BaseInternalFormat),
+			_Width(Width),
+			_Height(Height),
+			_RawData(nullptr)
 		{
 			glGenTextures(1, &_ID);
 			glActiveTexture(GL_TEXTURE0);
