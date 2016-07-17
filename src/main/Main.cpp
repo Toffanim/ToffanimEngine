@@ -9,6 +9,7 @@
 using namespace std;
 
 #include "../engine.h"
+using namespace TE;// <= Using namesapce TE to save time
 
 //TODO(Marc)
 
@@ -16,30 +17,40 @@ using namespace std;
 //Get GLEW MX to be able to have multiple window with multiple context (thread safe) ??
 
 
+static bool Continue = true;
+
+void CloseApp()
+{
+	Continue = false;
+}
 
 //Launch game
 int main(int argc, char** argv)
 {
 	//Init
-	TE::TE_Init();
+	TE_Init();
 
 	//Window
 	const int ScreenWidth = 720;
 	const int ScreenHeight = 480;
-	TE::Core::window Window(ScreenWidth, ScreenHeight, "New Window");
+	Core::window Window(ScreenWidth, ScreenHeight, "New Window");
 	Window.MakeCurrent();
 
+	std::shared_ptr<Core::input_component> InputComponent = std::make_shared<Core::input_component>();
+	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_ESCAPE, GLFW_PRESS), &CloseApp);
+	Core::DefaultInputHandler.Add(InputComponent);
+	
 	//Camera
-	TE::Renderer::camera_actor Camera(vec3f(0.f,0.f,10.f));
-	TE::Renderer::camera_properties CameraProperties = {};
+	Renderer::camera_actor Camera(vec3f(0.f,0.f,10.f));
+	Renderer::camera_properties CameraProperties = {};
 	CameraProperties.AspectRatio = (float) Window.GetWidth() / Window.GetHeight();
 	Camera.SetCameraProperty(CameraProperties);
+	InputComponent->SetupAttachement(&Camera.Root());
+	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_W, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(0.f,0.f,1.f)));
+	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_A, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(1.f, 0.f, 0.f)));
+	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_S, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(0.f, 0.f, -1.f)));
+	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_D, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(-1.f, 0.f, 0.f)));
 
-	//Matrices
-	mat4f WorldToView = Camera.GetView();
-	mat4f Projection = Camera.GetProjection();
-	mat4f MV = Projection * WorldToView;
-	mat4f MVP = MV;
 
 	//Geometry
 	int   quad_triangleCount = 2;
@@ -61,45 +72,50 @@ int main(int argc, char** argv)
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertices), quad_vertices, GL_STATIC_DRAW);
 
 	//Texture
-	TE::Core::texture2D Test("../assets/textures/final.png", "final",
-		TE::Core::texture2D::base_internal_format::RGB,
-		TE::Core::texture2D::sized_internal_format::SRGB8,
-		TE::Core::texture2D::data_type::UNSIGNED_BYTE);
+	Core::texture2D Test("../assets/textures/final.png", "final",
+		Core::texture2D::base_internal_format::RGB,
+		Core::texture2D::sized_internal_format::SRGB8,
+		Core::texture2D::data_type::UNSIGNED_BYTE);
 
 	//Shaders
-	TE::Renderer::shader BlitShader("Blit");
-	BlitShader.Attach(TE::Renderer::shader::type::VERTEX, "../assets/shaders/blit.vert");
-	BlitShader.Attach(TE::Renderer::shader::type::FRAGMENT, "../assets/shaders/blit.frag");
+	Renderer::shader BlitShader("Blit");
+	BlitShader.Attach(Renderer::shader::type::VERTEX, "../assets/shaders/blit.vert");
+	BlitShader.Attach(Renderer::shader::type::FRAGMENT, "../assets/shaders/blit.frag");
 	BlitShader.Link();
-	TE::Renderer::shader GBufferShader("GBuffer");
-	GBufferShader.Attach(TE::Renderer::shader::type::VERTEX, "../assets/shaders/gbuffer.vert");
-	GBufferShader.Attach(TE::Renderer::shader::type::FRAGMENT, "../assets/shaders/gbuffer.frag");
+	Renderer::shader GBufferShader("GBuffer");
+	GBufferShader.Attach(Renderer::shader::type::VERTEX, "../assets/shaders/gbuffer.vert");
+	GBufferShader.Attach(Renderer::shader::type::FRAGMENT, "../assets/shaders/gbuffer.frag");
 	GBufferShader.Link();
 
 	// FBOs
-	TE::Core::fbo GBufferFBO(Window.GetWidth(), Window.GetHeight());
-	GBufferFBO.AddDrawBuffer("Color", TE::Core::fbo::attachment::COLOR0,
-		TE::Core::texture2D::base_internal_format::RGBA,
-		TE::Core::texture2D::sized_internal_format::RGBA32F,
-		TE::Core::texture2D::data_type::FLOAT);
-	GBufferFBO.AddDrawBuffer("Normals", TE::Core::fbo::attachment::COLOR1,
-		TE::Core::texture2D::base_internal_format::RGBA,
-		TE::Core::texture2D::sized_internal_format::RGBA32F,
-		TE::Core::texture2D::data_type::FLOAT);
-	GBufferFBO.AddDepthBuffer(TE::Core::texture2D::sized_internal_format::DEPTH_COMPONENT24);
+	Core::fbo GBufferFBO(Window.GetWidth(), Window.GetHeight());
+	GBufferFBO.AddDrawBuffer("Color", Core::fbo::attachment::COLOR0,
+		Core::texture2D::base_internal_format::RGBA,
+		Core::texture2D::sized_internal_format::RGBA32F,
+		Core::texture2D::data_type::FLOAT);
+	GBufferFBO.AddDrawBuffer("Normals", Core::fbo::attachment::COLOR1,
+		Core::texture2D::base_internal_format::RGBA,
+		Core::texture2D::sized_internal_format::RGBA32F,
+		Core::texture2D::data_type::FLOAT);
+	GBufferFBO.AddDepthBuffer(Core::texture2D::sized_internal_format::DEPTH_COMPONENT24);
 
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.f, 1.f, 0.0f, 1.f);
 
 	//Main loop
-	while (glfwGetKey(Window.GetHandle(), GLFW_KEY_ESCAPE) != GLFW_PRESS)
+	while (Continue)
 	{
-		
+		//Matrices
+		mat4f WorldToView = Camera.GetView();
+		mat4f Projection = Camera.GetProjection();
+		mat4f MV = Projection * WorldToView;
+		mat4f MVP = MV;
+
 		glViewport(0, 0, Window.GetWidth(), Window.GetHeight());
 		GBufferFBO.Bind();
 		glClearColor(0.f, 1.f, 0.0f, 1.f);
 		GBufferFBO.Clear();
-		
+
 		GBufferShader.Use();
 		GBufferShader.SetMatrix4("MVP", MVP);
 		GBufferShader.SetMatrix4("MV", MV);
@@ -110,12 +126,12 @@ int main(int argc, char** argv)
 		glActiveTexture(GL_TEXTURE0);
 		Test.Bind();
 		glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, (void*)0);
-		
+
 
 		//Clean FBOs
-		TE::Core::fbo::BindDefaultFBO();
+		Core::fbo::BindDefaultFBO();
 		glClearColor(0.f, 1.f, 1.0f, 1.f);
-		TE::Core::fbo::ClearDefaultFBO();
+		Core::fbo::ClearDefaultFBO();
 
 		glViewport(0, 0, Window.GetWidth() / 2, Window.GetHeight() / 2);
 		BlitShader.Use();
@@ -124,7 +140,7 @@ int main(int argc, char** argv)
 		glBindVertexArray(vao);
 		GBufferFBO.BindTexture("Color");
 		glDrawElements(GL_TRIANGLES, 2 * 3, GL_UNSIGNED_INT, (void*)0);
-		
+
 		Window.SwapBuffers();
 		Utils::checkGlError("end frame");
 	}

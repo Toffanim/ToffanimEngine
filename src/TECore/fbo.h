@@ -6,8 +6,8 @@ $Revision: $
 $Creator:  $
 $Notice: $
 ======================================================================== */
-
 #define FBO_H
+
 #include "texture.h"
 #include <stdlib.h>
 #include <iostream>

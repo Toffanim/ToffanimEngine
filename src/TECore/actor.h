@@ -11,6 +11,8 @@ $Notice: $
 
 #include "component.h"
 #include "math.h"
+#include <stdlib.h>
+#include <vector>
 
 using namespace TE::Math;
 
@@ -31,7 +33,7 @@ namespace TE
 			//Called the first time the actor is actually rendered in the scene
 			virtual void BeginTick() = 0;
             //Called every frame
-			virtual void Tick() = 0;
+			virtual void Tick( float DeltaTime) = 0;
 
 			vec3f GetPosition();
 			vec3f GetLocalPosition();
@@ -46,10 +48,20 @@ namespace TE
 				vec3f Rotation,
 				vec3f Scale);
 
+			component& Root() const {
+				return(*_Root);
+			};
+
+			bounding_box GetAABB()
+			{
+				return(_BoundingBox);
+			}
+
 		protected:
 			void ExtendBoundingBox(bounding_box NewItemBoundingBox);
 
-			component* _Child;
+			component* _Root;
+			std::vector<component*> _Childs;
 			vec3f _Position;
 			rotation _Rotation;
 			axis3 _Axis;

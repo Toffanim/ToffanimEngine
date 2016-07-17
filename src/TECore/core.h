@@ -16,5 +16,6 @@ $Notice: $
 #include "Initialisation.h"
 #include "sprite.h"
 #include "fbo.h"
-
+#include "input_handler.h"
+#include "input_component.h"
 #endif

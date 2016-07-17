@@ -20,6 +20,7 @@ $Notice: $
 #include <stdlib.h>
 #include <iostream>
 #include "../utils/Utils.h"
+#include "input_handler.h"
 
 namespace TE
 {

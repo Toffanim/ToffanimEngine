@@ -4,11 +4,11 @@ namespace TE
 {
 	namespace Core
 	{
-		actor::actor()
+		actor::actor() : _Root(new component())
 		{
 		}
 
-		actor::actor(vec3f Position) : _Position(Position)
+		actor::actor(vec3f Position) : _Position(Position), _Root(new component())
 		{
 		}
 

@@ -40,7 +40,7 @@ namespace TE
 			~camera_actor();
 
 			void BeginTick() override {};
-			void Tick() override {};
+			void Tick( float DeltaTime ) override {};
 
 			void SetCameraProperty(camera_properties Properties);
 			Math::mat4f GetView();

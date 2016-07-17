@@ -9,17 +9,22 @@ $Notice: $
 
 #define COMPONENT_H
 
-class component
+namespace TE
 {
-    public :
-	   component();
-	   ~component();
-	   
-	   void SetupAttachement( component& Parent );
-	   
-	private :
-	    component* _Parent;
-		component* _Child;
-};
+	namespace Core
+	{
+		class component
+		{
+		public:
+			component();
+			~component();
 
+			void SetupAttachement(component* Parent);
+
+		private:
+			component* _Parent;
+			component* _Child;
+		};
+	}
+}
 #endif

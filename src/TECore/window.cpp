@@ -22,6 +22,7 @@ namespace TE
 			}
 			glfwSetInputMode(_WindowHandle, GLFW_STICKY_KEYS, GL_TRUE);
 			glfwSetInputMode(_WindowHandle, GLFW_STICKY_MOUSE_BUTTONS, 1);
+			BindInputHandler();
 		}
 
 
@@ -30,7 +31,7 @@ namespace TE
 			glfwDestroyWindow(_WindowHandle);
 		}
 
-		void window::MakeCurrent()
+		void window::MakeCurrent() const
 		{
 			//We have to make the context current before initializing Glew
 			glfwMakeContextCurrent(_WindowHandle);
@@ -50,7 +51,7 @@ namespace TE
 				glfwSwapInterval(0);
 		}
 
-		void window::SwapBuffers()
+		void window::SwapBuffers() const
 		{
 			glfwSwapBuffers(_WindowHandle);
 			glfwPollEvents();

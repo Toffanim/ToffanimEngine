@@ -35,6 +35,20 @@ namespace TE
 		{
 			vec3f UpperBound;
 			vec3f LowerBound;
+			vec3f Center;
+
+			int MainAxis() const
+			{
+				auto DiffX = UpperBound.x - LowerBound.x;
+				auto DiffY = UpperBound.y - LowerBound.y;
+				auto DiffZ = UpperBound.z - LowerBound.z;
+				if (DiffX > DiffY || DiffX > DiffZ)
+					return 0;
+				if (DiffY > DiffX || DiffY > DiffZ)
+					return 1;
+				if (DiffZ > DiffX || DiffZ > DiffY)
+					return 2;
+			}
 		};
 
 		struct rotation

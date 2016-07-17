@@ -13,6 +13,7 @@ $Notice: $
 #include <stdlib.h>
 #include <iostream>
 #include "../utils/Utils.h"
+#include "input_handler.h"
 namespace TE
 {
 	namespace Core
@@ -26,37 +27,40 @@ namespace TE
 			{ 
 				return (_IsResizable); 
 			}
-			void SetResizable( const bool B );
+			void SetResizable( bool B );
 
 			void SetFullScreen();
 			void SetWindowed();
 
-			void SwapBuffers();
-			void MakeCurrent();
+			void SwapBuffers() const;
+			void MakeCurrent() const;
 
-			void SetVerticalSync( const bool B );
+			void SetVerticalSync( bool B );
 			bool IsVerticalSyncOn() const 
 			{
 				return (_IsVerticalSyncOn);
 			}
 
-			void SetKeyCallback();
-			void SetMouseCallback();
-			void SetCursorCallback();
-
-			GLFWwindow* GetHandle()
+			GLFWwindow* GetHandle() const
 			{
 				return(_WindowHandle);
 			}
 
-			int GetWidth()
+			int GetWidth() const
 			{
 				return(_Width);
 			}
 
-			int GetHeight()
+			int GetHeight() const
 			{
 				return(_Height);
+			}
+
+			void BindInputHandler() const
+			{				
+				glfwSetKeyCallback(_WindowHandle, &TE::Core::KeyboardCallback);
+				glfwSetCursorPosCallback(_WindowHandle, &TE::Core::MouseCursorCallback);
+				glfwSetMouseButtonCallback(_WindowHandle, &TE::Core::MouseCallback);
 			}
 
 			~window();

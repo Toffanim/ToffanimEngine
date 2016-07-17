@@ -64,8 +64,7 @@ namespace TE
 					glBindFramebuffer(GL_FRAMEBUFFER, 0);
 					return;
 				}
-			}
-			
+			}		
 		}
 
 		void fbo::Clear(clear_type Type)
