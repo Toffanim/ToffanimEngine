@@ -11,12 +11,13 @@ $Notice: $
 
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <math.h>
 
 namespace TE
 {
 	namespace Math
 	{
-		//TYpedef to wrap around GLM
+		//TYPEDEF TO WRAP AROUND GLM
 		//Integer vectors
 		using vec2i = glm::ivec2;
 		using vec3i = glm::ivec3;
@@ -30,7 +31,6 @@ namespace TE
 		using mat3f = glm::fmat3;
 		using mat4f = glm::fmat4;
 		
-
 		struct bounding_box
 		{
 			vec3f UpperBound;

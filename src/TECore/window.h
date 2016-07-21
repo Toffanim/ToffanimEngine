@@ -12,8 +12,9 @@ $Notice: $
 #include "GLFW/glfw3.h"
 #include <stdlib.h>
 #include <iostream>
-#include "../utils/Utils.h"
+#include "utils.h"
 #include "input_handler.h"
+
 namespace TE
 {
 	namespace Core

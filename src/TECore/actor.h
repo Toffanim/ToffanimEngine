@@ -31,9 +31,19 @@ namespace TE
 			~actor();
 
 			//Called the first time the actor is actually rendered in the scene
-			virtual void BeginTick() = 0;
+			virtual void BeginTick() {};
             //Called every frame
-			virtual void Tick( float DeltaTime) = 0;
+			virtual void Tick(float DeltaTime) 
+			{  
+				for (auto Component : _Childs)
+					Component->Tick(DeltaTime);
+			};
+
+			virtual void Render()
+			{
+				for (auto Component : _Childs)
+					Component->Render();
+			}
 
 			vec3f GetPosition();
 			vec3f GetLocalPosition();

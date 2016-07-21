@@ -9,11 +9,13 @@ $Notice: $
 
 #define INPUT_HANDLER_H
 
+#include "globals.h"
 #include "GLFW\glfw3.h"
 #include <stdlib.h>
 #include <vector>
 #include <memory>
 #include "input_component.h"
+
 
 namespace TE
 {
@@ -63,21 +65,19 @@ namespace TE
 			std::vector<std::shared_ptr<input_component>> _Controllers;
 		};
 
-		extern Core::input_handler DefaultInputHandler;
-
 		static void KeyboardCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
 		{
-			DefaultInputHandler.DispatchKey(Key, Action);
+			TE::DefaultInputHandler->DispatchKey(Key, Action);
 		}
 
 		static void MouseCursorCallback(GLFWwindow* Window, double XPos, double YPos)
 		{
-			DefaultInputHandler.DispatchMouseCursor(XPos, YPos);
+			TE::DefaultInputHandler->DispatchMouseCursor(XPos, YPos);
 		}
 
 		static void MouseCallback(GLFWwindow* Window, int Button, int Action, int Mods)
 		{
-			DefaultInputHandler.DispatchMouseKey(Button, Action);
+			TE::DefaultInputHandler->DispatchMouseKey(Button, Action);
 		}
 	}
 }

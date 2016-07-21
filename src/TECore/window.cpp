@@ -35,11 +35,12 @@ namespace TE
 		{
 			//We have to make the context current before initializing Glew
 			glfwMakeContextCurrent(_WindowHandle);
+			glewExperimental = true;
 			if (glewInit() != GLEW_OK)
 			{
 				std::cout << "Failed to initialize GLEW" << std::endl;
 			}
-			Utils::checkGlError("GLEW INIT (Safe To Ignore)");
+			Core::CheckOpenGLError("GLEW INIT (Safe To Ignore)");
 		}
 
 		void window::SetVerticalSync(bool B)

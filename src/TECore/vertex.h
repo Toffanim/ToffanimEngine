@@ -1,4 +1,4 @@
-#if !defined(RENDERER_H)
+#if !defined(VERTEX_H)
 /* ========================================================================
 $File: $
 $Date: $
@@ -7,10 +7,21 @@ $Creator:  $
 $Notice: $
 ======================================================================== */
 
-#define RENDERER_H
+#define VERTEX_H
+#include "math.h"
 
-#include "shader.h"
-#include "camera_actor.h"
-#include "sprite.h"
+namespace TE
+{
+	namespace Core
+	{
+		struct vertex
+		{
+			Math::vec3f Position;
+			Math::vec3f Normal;
+			Math::vec2f TextureCoords;
+		};
+	}
+}
+
 
 #endif

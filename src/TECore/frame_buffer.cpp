@@ -1,23 +1,21 @@
-#include "fbo.h"
-
-#include "../utils/Utils.h"
+#include "frame_buffer.h"
 
 namespace TE
 {
 	namespace Core
 	{
-		fbo::fbo(unsigned int Width, unsigned int Height) :
+		frame_buffer::frame_buffer(unsigned int Width, unsigned int Height) :
 			_Width(Width), _Height(Height), _CheckCompletness(true)
 		{
 			glGenFramebuffers(1, &_ID);
 		}
 
-		fbo::~fbo()
+		frame_buffer::~frame_buffer()
 		{
 			glDeleteFramebuffers(1, &_ID);
 		}
 
-		void fbo::AddDrawBuffer(std::string Name, attachment Attachment, texture2D::base_internal_format BaseInternalFormat,
+		void frame_buffer::AddDrawBuffer(std::string Name, attachment Attachment, texture2D::base_internal_format BaseInternalFormat,
 			texture2D::sized_internal_format SizedInternalFormat,
 			texture2D::data_type DataType)
 		{
@@ -33,7 +31,7 @@ namespace TE
 			_CheckCompletness = true;
 		}
 
-		void fbo::AddDepthBuffer(texture2D::sized_internal_format SizedInternalFormat)
+		void frame_buffer::AddDepthBuffer(texture2D::sized_internal_format SizedInternalFormat)
 		{
 			_DepthAttachment = std::make_unique<texture2D>(_Width, _Height, texture2D::DEPTH_COMPONENT, SizedInternalFormat, texture2D::FLOAT);
 			glBindFramebuffer(GL_FRAMEBUFFER, _ID);
@@ -42,7 +40,7 @@ namespace TE
 			_CheckCompletness = true;
 		}
 
-		void fbo::BindTexture(std::string Name)
+		void frame_buffer::BindTexture(std::string Name)
 		{
 			auto Result = _ColorAttachments[Name].get();
 			if (Result)
@@ -51,7 +49,7 @@ namespace TE
 				std::cerr << "Trying to bind unknown FBO texture" << std::endl;
 		}
 
-		void fbo::Bind()
+		void frame_buffer::Bind()
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, _ID);
 			if (_CheckCompletness)
@@ -67,7 +65,7 @@ namespace TE
 			}		
 		}
 
-		void fbo::Clear(clear_type Type)
+		void frame_buffer::Clear(clear_type Type)
 		{
 			//Bind();
 			//glClear(Type);

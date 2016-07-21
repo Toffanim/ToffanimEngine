@@ -15,9 +15,9 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
-#include "glew/glew.h"
+#include "GL/glew.h"
 #include "glm/glm.hpp"
-#include "../mesh/AABB.h"
+//#include "../mesh/AABB.h"
 
 namespace Utils
 {
@@ -37,6 +37,6 @@ namespace Utils
     GLuint TextureFromFile( const char* path, std::string directory);
     float absmin( float a, float b);
     void load_ppm(ImageRGB &img, const std::string &name);
-    bool AABBtoAABB(const AABB& tBox1, const AABB& tBox2);
+    //bool AABBtoAABB(const AABB& tBox1, const AABB& tBox2);
 };
 #endif

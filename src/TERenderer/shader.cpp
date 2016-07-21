@@ -95,27 +95,27 @@ namespace TE
 		void shader::SetInt(const std::string& UniformName, int Value) const
 		{
 			glUniform1i(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), Value);
-			Utils::checkGlError("Error trying to set int");
+			Core::CheckOpenGLError("Error trying to set int");
 		}
 		void shader::SetFloat(const std::string& UniformName, float Value) const
 		{
 			glUniform1f(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), Value);
-			Utils::checkGlError("Error trying to set float");
+			Core::CheckOpenGLError("Error trying to set float");
 		}
 		void shader::SetVector3(const std::string& UniformName, const glm::vec3& Value) const
 		{
 			glUniform3fv(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), 1, &Value[0]);
-			Utils::checkGlError("Error trying to set vector3");
+			Core::CheckOpenGLError("Error trying to set vector3");
 		}
 		void shader::SetVector4(const std::string& UniformName, const glm::vec4& Value) const
 		{
 			glUniform4fv(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), 1, &Value[0]);
-			Utils::checkGlError("Error trying to set vector4");
+			Core::CheckOpenGLError("Error trying to set vector4");
 		}
 		void shader::SetMatrix4(const std::string& UniformName, const glm::mat4& Value) const
 		{
 			glUniformMatrix4fv(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), 1, GL_FALSE, glm::value_ptr(Value));
-			Utils::checkGlError("Error trying to set matrix 4*4");
+			Core::CheckOpenGLError("Error trying to set matrix 4*4");
 		}
 
 		const char* shader::ReadFile(const char* name) const

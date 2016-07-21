@@ -19,6 +19,12 @@ namespace TE
 			component();
 			~component();
 
+			virtual void Tick(float DeltaTime)
+			{}
+
+			virtual void Render()
+			{}
+
 			void SetupAttachement(component* Parent);
 
 		private:

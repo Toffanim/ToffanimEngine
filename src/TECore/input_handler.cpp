@@ -4,8 +4,6 @@ namespace TE
 {
 	namespace Core
 	{
-		input_handler DefaultInputHandler;
-
 		input_handler::input_handler()
 		{
 		}
@@ -14,6 +12,5 @@ namespace TE
 		input_handler::~input_handler()
 		{
 		}
-
 	}
 }

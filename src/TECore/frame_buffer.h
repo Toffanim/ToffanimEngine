@@ -1,4 +1,4 @@
-#if !defined(FBO_H)
+#if !defined(FRAME_BUFFER_H)
 /* ========================================================================
 $File: $
 $Date: $
@@ -6,7 +6,7 @@ $Revision: $
 $Creator:  $
 $Notice: $
 ======================================================================== */
-#define FBO_H
+#define FRAME_BUFFER_H
 
 #include "texture.h"
 #include <stdlib.h>
@@ -14,15 +14,14 @@ $Notice: $
 #include <vector>
 #include <map>
 #include <memory>
+#include "utils.h"
 
 namespace TE
 {
 	namespace Core
 	{
-		class fbo
+		class frame_buffer
 		{
-
-
 		public:
 
 			static void BindDefaultFBO()
@@ -53,14 +52,14 @@ namespace TE
 				CLEAR_ALL = (CLEAR_COLOR | CLEAR_DEPTH | CLEAR_STENCIL),
 			};
 
-			fbo(unsigned int Width, unsigned int Height);
-			~fbo();
+			frame_buffer(unsigned int Width, unsigned int Height);
+			~frame_buffer();
 
 			void AddDrawBuffer(std::string Name, attachment Attachment, texture2D::base_internal_format BaseInternalFormat,
 				texture2D::sized_internal_format SizedInternalFormat,
 				texture2D::data_type DataType);
 
-			void fbo::AddDepthBuffer(texture2D::sized_internal_format SizedInternalFormat);
+			void frame_buffer::AddDepthBuffer(texture2D::sized_internal_format SizedInternalFormat);
 
 			void Bind();
 
