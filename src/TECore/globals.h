@@ -27,6 +27,7 @@ namespace TE
 }
 #include <vector>
 
+
 //Global variables
 // NOTE(Marc) : DEFINE VARIABLES IN "initialization.h"
 //
