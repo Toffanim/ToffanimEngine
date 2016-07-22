@@ -14,24 +14,30 @@ $Notice: $
 #include "TERenderer\shader.h"
 #include "TECore\frame_buffer.h"
 #include "TECore\globals.h"
+#include "TECore\math.h"
+#include "TECore\vertex_array.h"
+#include "TECore\actor.h"
 
 namespace TE
 {
 	namespace Renderer
 	{
-		class sprite : public Core::component
+		class sprite : public Core::component_CRTP<sprite>
 		{
 		public:
 			sprite(Core::texture2D& Texture);
 			sprite(const std::string FilePath);
 			~sprite();
 
+			void SetSize(Math::vec2f NewSize);
+			Math::vec2f GetSize() const;
 			void Tick(float DeltaTime) override {};
-			void Render() override;
+			void Render(Math::mat4f Projection, Math::mat4f View) override;
 
 		private:
 			Core::texture2D& _Texture;
-			unsigned int _Quad;
+			Core::vertex_array* _Quad;
+			Math::vec2f _Size;
 		};
 	}
 }

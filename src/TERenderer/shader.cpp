@@ -28,7 +28,7 @@ namespace TE
 			glUseProgram(0);
 		}
 
-		void shader::Use() const
+		void shader::Bind() const
 		{
 			glUseProgram(_ProgramHandle);
 		}

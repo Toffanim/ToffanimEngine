@@ -4,12 +4,16 @@ namespace TE
 {
 	namespace Core
 	{
-		actor::actor() : _Root(new component())
+		actor::actor() : _Root(new default_component()),
+			_Childs(std::vector<component*>({ _Root }))
 		{
+			_Root->SetupAttachement(this);
 		}
 
-		actor::actor(vec3f Position) : _Position(Position), _Root(new component())
+		actor::actor(vec3f Position) : _Position(Position), _Root(new default_component()),
+			_Childs(std::vector<component*>({ _Root }))
 		{
+			_Root->SetupAttachement(this);
 		}
 
 		actor::~actor()

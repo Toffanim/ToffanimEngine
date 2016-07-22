@@ -39,10 +39,10 @@ namespace TE
 					Component->Tick(DeltaTime);
 			};
 
-			virtual void Render()
+			virtual void Render( Math::mat4f Projection, Math::mat4f View)
 			{
 				for (auto Component : _Childs)
-					Component->Render();
+					Component->Render(Projection, View);
 			}
 
 			vec3f GetPosition();
@@ -58,8 +58,8 @@ namespace TE
 				vec3f Rotation,
 				vec3f Scale);
 
-			component& Root() const {
-				return(*_Root);
+			component* Root() const {
+				return(_Root);
 			};
 
 			bounding_box GetAABB()
@@ -71,7 +71,7 @@ namespace TE
 			void ExtendBoundingBox(bounding_box NewItemBoundingBox);
 
 			component* _Root;
-			std::vector<component*> _Childs;
+			std::vector< component* > _Childs;
 			vec3f _Position;
 			rotation _Rotation;
 			axis3 _Axis;
