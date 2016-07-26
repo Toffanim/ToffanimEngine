@@ -17,7 +17,7 @@ namespace TE
 {
 	namespace Core
 	{
-		class input_component : public component
+		class input_component : public component_CRTP<input_component>
 		{
 		public:
 			input_component();

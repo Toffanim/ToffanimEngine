@@ -72,13 +72,22 @@ int main(int argc, char** argv)
 	std::shared_ptr<Core::input_component> InputComponent = std::make_shared<Core::input_component>();
 	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_ESCAPE, GLFW_PRESS), &CloseApp);
 	TE::DefaultInputHandler->Add(InputComponent);
-	InputComponent->SetupAttachement(&Camera.Root());
+	InputComponent->SetupAttachement(Camera.Root());
 	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_W, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(0.f,0.f,1.f)));
 	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_A, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(1.f, 0.f, 0.f)));
 	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_S, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(0.f, 0.f, -1.f)));
 	InputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_D, GLFW_PRESS), std::bind(&Renderer::camera_actor::AddVector, &Camera, vec3f(-1.f, 0.f, 0.f)));
 
-
+	//Texture
+	Core::texture2D Test("../assets/textures/final.png", "final",
+		Core::texture2D::base_internal_format::RGB,
+		Core::texture2D::sized_internal_format::SRGB8,
+		Core::texture2D::data_type::UNSIGNED_BYTE);
+	//Sprite
+	Core::actor Sprite;
+	Renderer::sprite SpriteComponent(Test);
+	SpriteComponent.SetupAttachement(&Sprite);
+	SpriteComponent.SetSize({ 1.f, 1.f });
 	//Geometry
 	std::vector<Core::vertex> Vertices;
 	Vertices.push_back({ { -1.f, -1.f, 0.f },  //Position
@@ -111,11 +120,7 @@ int main(int argc, char** argv)
 	Core::vertex_array Quad(Vertices, Indices);
 	Core::vertex_array UnitQuad(Vertices2, Indices);
 
-	//Texture
-	Core::texture2D Test("../assets/textures/final.png", "final",
-		Core::texture2D::base_internal_format::RGB,
-		Core::texture2D::sized_internal_format::SRGB8,
-		Core::texture2D::data_type::UNSIGNED_BYTE);
+
 
 	//Shaders
 	Renderer::shader BlitShader("Blit");
@@ -138,9 +143,9 @@ int main(int argc, char** argv)
 			Quad.Update(Vertices);
 		}
 		//Matrices
-		mat4f WorldToView = Camera.GetView();
+		mat4f View = Camera.GetView();
 		mat4f Projection = Camera.GetProjection();
-		mat4f MV = Projection * WorldToView;
+		mat4f MV = Projection * View;
 		mat4f MVP = MV;
 
 		glViewport(0, 0, TE::Window->GetWidth(), TE::Window->GetHeight());
@@ -148,15 +153,7 @@ int main(int argc, char** argv)
 		glClearColor(0.f, 1.f, 0.0f, 1.f);
 		TE::GBufferFBO->Clear();
 
-		TE::GBufferShader->Use();
-		TE::GBufferShader->SetMatrix4("MVP", MVP);
-		TE::GBufferShader->SetMatrix4("MV", MV);
-		TE::GBufferShader->SetInt("ReverseNormals", 0);
-		TE::GBufferShader->SetInt("Material.Texture", 0);
-		TE::GBufferShader->SetInt("Material.HasTexture", 1);
-		glActiveTexture(GL_TEXTURE0);
-		Test.Bind();
-		Quad.Render();
+		Sprite.Render( Projection, View );
 
 
 		//Clean FBOs
@@ -165,7 +162,7 @@ int main(int argc, char** argv)
 		Core::frame_buffer::ClearDefaultFBO();
 
 		glViewport(0, 0, TE::Window->GetWidth() / 2, TE::Window->GetHeight() / 2);
-		BlitShader.Use();
+		BlitShader.Bind();
 		BlitShader.SetInt("Texture", 0);
 		glActiveTexture(GL_TEXTURE0);
 		TE::GBufferFBO->BindTexture("Color");

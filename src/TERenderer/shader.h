@@ -42,7 +42,7 @@ namespace TE
 			void Link();
 			void Unuse() const;
 			GLuint GetProgram() const { return(_ProgramHandle); }
-			void Use() const;
+			void Bind() const;
 			GLuint operator[](int idx){ return(_Handles[idx]); }
 
 			void SetInt(const std::string& UniformName, int Value) const;

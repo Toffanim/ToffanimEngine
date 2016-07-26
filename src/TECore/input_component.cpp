@@ -8,7 +8,7 @@ namespace TE
 		//This way we can bind whatever button to the "Named Action" and it will work
 
 		// Make it autobind to the default input_handler, circular dependency ? 
-		input_component::input_component() : component()
+		input_component::input_component()
 		{
 		}
 
