@@ -1,4 +1,5 @@
 #include "input_component.h"
+#include "input_handler.h"
 
 namespace TE
 {
@@ -7,9 +8,10 @@ namespace TE
 		//TODO(Marc) : Make this thing more robust, with binding of "Named Action" to a function call
 		//This way we can bind whatever button to the "Named Action" and it will work
 
-		// Make it autobind to the default input_handler, circular dependency ? 
-		input_component::input_component()
-		{
+		// Make it autobind to the default input_handler ? c.f Init
+		input_component::input_component() 
+		{		
+			IsRenderable = false;
 		}
 
 
@@ -19,6 +21,7 @@ namespace TE
 
 		void input_component::Init()
 		{
+			TE::DefaultInputHandler->Add(shared_from_this());
 		}
 
 		void input_component::ProcessKey(int Key, int Action)

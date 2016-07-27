@@ -1,15 +1,16 @@
 #include "sprite.h"
+#include "TECore\actor.h"
 
 namespace TE
 {
 	namespace Renderer
 	{		
-		sprite::sprite(Core::texture2D& Texture) : _Texture(Texture), _Quad(nullptr)
+		sprite::sprite(Core::texture2D& Texture) : _Texture(&Texture), _Quad(nullptr)
 		{
 		}
 
 		sprite::sprite(const std::string FilePath)
-			: _Texture(Core::texture2D(FilePath)),
+			: _Texture( new Core::texture2D(FilePath)),
 			_Quad(nullptr)
 		{
 		}
@@ -33,25 +34,26 @@ namespace TE
 			if (_Owner)
 			{
 				Math::vec3f SpriteCenter = _Owner->GetPosition();
+				Math::axis3 Axis = _Owner->GetAxis();
 				std::vector<Core::vertex> Vertices;
 				Vertices.reserve(4);
 				Math::vec3f NewVertex;
-				NewVertex = { SpriteCenter.x - _Size.x, SpriteCenter.y - _Size.y, SpriteCenter.z };
+				NewVertex = SpriteCenter - (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
 				{ 0.f, 0.f } });
-				NewVertex = { SpriteCenter.x + _Size.x, SpriteCenter.y - _Size.y, SpriteCenter.z };
+				NewVertex = SpriteCenter + (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 0.f, 0.f } });
-				NewVertex = { SpriteCenter.x - _Size.x, SpriteCenter.y + _Size.y, SpriteCenter.z };
+				{ 0.f, 1.f } });
+				NewVertex = SpriteCenter - (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 0.f, 0.f } });
-				NewVertex = { SpriteCenter.x + _Size.x, SpriteCenter.y + _Size.y, SpriteCenter.z };
+				{ 1.f, 0.f } });
+				NewVertex = SpriteCenter + (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 0.f, 0.f } });
+				{ 1.f, 1.f } });
 
 				if (_Quad)
 					_Quad->Update(Vertices);
@@ -70,7 +72,7 @@ namespace TE
 				TE::GBufferShader->SetInt("Material.Texture", 0);
 				TE::GBufferShader->SetInt("Material.HasTexture", 1);
 				glActiveTexture(GL_TEXTURE0);
-				_Texture.Bind();
+				_Texture->Bind();
 				_Quad->Render();
 			}
 		}

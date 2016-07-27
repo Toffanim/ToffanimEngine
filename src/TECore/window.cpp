@@ -22,6 +22,7 @@ namespace TE
 			}
 			glfwSetInputMode(_WindowHandle, GLFW_STICKY_KEYS, GL_TRUE);
 			glfwSetInputMode(_WindowHandle, GLFW_STICKY_MOUSE_BUTTONS, 1);
+			glfwSetInputMode(_WindowHandle, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 			BindInputHandler();
 		}
 

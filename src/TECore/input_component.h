@@ -12,12 +12,14 @@ $Notice: $
 #include <stdlib.h>
 #include <map>
 #include <functional>
+#include "globals.h"
+#include <memory>
 
 namespace TE
 {
 	namespace Core
 	{
-		class input_component : public component_CRTP<input_component>
+		class input_component : public component_CRTP<input_component>, public std::enable_shared_from_this<input_component>
 		{
 		public:
 			input_component();

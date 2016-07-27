@@ -47,6 +47,7 @@ namespace TE
 
 			void SetInt(const std::string& UniformName, int Value) const;
 			void SetFloat(const std::string& UniformName, float Value) const;
+			void SetVector2(const std::string& UniformName, const glm::vec2& Value) const;
 			void SetVector3(const std::string& UniformName, const glm::vec3& Value) const;
 			void SetVector4(const std::string& UniformName, const glm::vec4& Value) const;
 			void SetMatrix4(const std::string& UniformName, const glm::mat4& Value) const;

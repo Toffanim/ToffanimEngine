@@ -10,6 +10,7 @@ $Notice: $
 #define COMPONENT_H
 
 #include "TECore\math.h"
+#include <vector>
 
 namespace TE
 {
@@ -42,7 +43,8 @@ namespace TE
 
 			component_CRTP() : _Owner(nullptr),
 				_Parent(nullptr),
-				_Child(nullptr)
+				_Child(),
+				IsRenderable(true)
 			{}
 
 			virtual void Tick(float DeltaTime) override
@@ -53,11 +55,15 @@ namespace TE
 
 			virtual void Render(Math::mat4f Projection, Math::mat4f View) override
 			{
-				auto Derived = static_cast< derived* >(this);
-				Derived->Render(Projection, View);
+				if (IsRenderable)
+				{
+					auto Derived = static_cast<derived*>(this);
+					Derived->Render(Projection, View);
 
-				if (_Child)
-					_Child->Render(Projection, View);
+					if (_Child.size())
+						for (auto Child : _Child)
+							Child->Render(Projection, View);
+				}
 			}
 
 			void SetupAttachement(component* Parent) override;
@@ -70,13 +76,27 @@ namespace TE
 
 			void SetChild(component* Child)
 			{
-				_Child = Child;
+				//Note(Marc) : should check that Child does not already exists in _Child
+				_Child.push_back(Child);
 			}
 
 		protected:
 			actor* _Owner;
 			component* _Parent;
-			component* _Child;
+			std::vector<component*> _Child;
+			bool IsRenderable;
+		};
+
+
+		class default_component : public component_CRTP < default_component >
+		{
+		public:
+			void Render(Math::mat4f Projection, Math::mat4f View)
+			{
+				if (_Child.size())
+					for (auto Child : _Child)
+						Child->Render(Projection, View);
+			};
 		};
 
 		template <class derived>
@@ -91,6 +111,7 @@ namespace TE
 		void component_CRTP<derived>::SetupAttachement(actor* Owner)
 		{
 			_Owner = Owner;
+			//SetupAttachement(_Owner->GetRoot());
 		}
 
 		template <typename derived>
@@ -99,15 +120,7 @@ namespace TE
 			return (_Owner);
 		}
 
-		class default_component : public component_CRTP < default_component >
-		{
-		public:
-			void Render(Math::mat4f Projection, Math::mat4f View) 
-			{
-				if (_Child)
-					_Child->Render(Projection, View);
-			};
-		};
+
 	}
 }
 #endif

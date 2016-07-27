@@ -35,7 +35,7 @@ namespace TE
 			void Render(Math::mat4f Projection, Math::mat4f View) override;
 
 		private:
-			Core::texture2D& _Texture;
+			Core::texture2D* _Texture;
 			Core::vertex_array* _Quad;
 			Math::vec2f _Size;
 		};

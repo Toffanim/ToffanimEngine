@@ -46,12 +46,15 @@ namespace TE
 			Math::mat4f GetView();
 			Math::mat4f GetProjection();
 
+			void HandleCursor(double xpos, double ypos);
+
 			void SetProjectionType(projection_type Type);
 
 		private:
 			camera_properties _Properties;
-			//Math::axis3 _Axis;
-			//Math::rotation _Rotation;
+			float _LastX;
+			float _LastY;
+			bool _IsFirstTime;
 		};
 	}
 }

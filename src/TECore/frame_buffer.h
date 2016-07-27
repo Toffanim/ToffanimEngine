@@ -61,12 +61,15 @@ namespace TE
 
 			void frame_buffer::AddDepthBuffer(texture2D::sized_internal_format SizedInternalFormat);
 
+			unsigned int GetDepthTextureID();
+
 			void Bind();
 
 			void Clear(clear_type Type = CLEAR_ALL);
 
 			//void BindTexture(attachment Attachment);
 			void BindTexture(std::string Name);
+			void BindDepthTexture();
 
 		private:
 			std::map < std::string, std::unique_ptr<texture2D> > _ColorAttachments;

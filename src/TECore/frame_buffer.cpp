@@ -49,6 +49,25 @@ namespace TE
 				std::cerr << "Trying to bind unknown FBO texture" << std::endl;
 		}
 
+		void frame_buffer::BindDepthTexture()
+		{
+			auto Result = _DepthAttachment.get();
+			if (Result)
+				Result->Bind();
+			else
+				std::cerr << "Trying to bind unknown FBO texture" << std::endl;
+		}
+
+		unsigned int frame_buffer::GetDepthTextureID()
+		{
+			auto Result = _DepthAttachment.get();
+			if (Result)
+				return (Result->GetID());
+			else
+				std::cerr << "Trying to bind unknown FBO texture" << std::endl;
+			return 0;
+		}
+
 		void frame_buffer::Bind()
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, _ID);

@@ -35,6 +35,7 @@ namespace TE
 		{
 			Bind();
 			glDrawElements(GL_TRIANGLES, _IndicesCount, GL_UNSIGNED_INT, (void*)0);
+			glBindVertexArray(0);
 		}
 
 		void vertex_array::Update(std::vector<Core::vertex> NewVertices)
