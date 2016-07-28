@@ -18,7 +18,7 @@ namespace TE
 				Position += _LocalPosition;
 				return glm::lookAt(Position, Position + _Axis.Front, _Axis.Up);
 			}
-			return glm::mat4();
+			return glm::lookAt(_LocalPosition, _LocalPosition + _Axis.Front, _Axis.Up);
 		}
 
 		Math::mat4f camera_component::GetProjection()
