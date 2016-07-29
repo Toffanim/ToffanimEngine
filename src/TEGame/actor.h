@@ -1,8 +1,10 @@
 #pragma once
-class actor
-{
-public:
-	actor();
-	~actor();
-};
+	class actor
+	{
+	public:
+		actor();
+		~actor();
+	};
+
+
 
