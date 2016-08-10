@@ -34,7 +34,7 @@ namespace TE
 			xoff *= sensitivity;
 			yoff *= -sensitivity;
 
-			AddRotation(-xoff,0, -yoff);
+			AddRotation(-xoff,0, yoff);
 		}
 
 		mat4f camera_actor::GetView()

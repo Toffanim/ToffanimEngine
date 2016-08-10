@@ -18,6 +18,8 @@ using namespace TE;// <= Using namesapce TE to save time
 //Get GLFW 3.2
 //Get GLEW MX to be able to have multiple window with multiple context (thread safe) ??
 
+//Check rotation in good coordinate system
+
 
 static bool Continue = true;
 
@@ -74,27 +76,27 @@ int main(int argc, char** argv)
 		Core::texture2D::sized_internal_format::SRGB8,
 		Core::texture2D::data_type::UNSIGNED_BYTE);
 	//Sprite actor
-	Core::actor Sprite;
+	std::shared_ptr<Core::actor> Sprite = std::make_shared<Core::actor>();
 	// Sprite component
 	Renderer::sprite SpriteComponent(Test2);
-	SpriteComponent.SetupAttachement(Sprite.GetRoot());
 	SpriteComponent.SetSize({ 1.f, 1.f });
+	SpriteComponent.SetupAttachement(Sprite->GetRoot());
 	// Input component
 	std::shared_ptr<Core::input_component> SpriteInputComponent = std::make_shared<Core::input_component>();
-	SpriteInputComponent->Init();
-	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_W, GLFW_PRESS), std::bind(&Core::actor::AddVector, &Sprite, vec3f(0.f, 0.f, 1.f)));
-	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_A, GLFW_PRESS), std::bind(&Core::actor::AddVector, &Sprite, vec3f(-1.f, 0.f, 0.f)));
-	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_S, GLFW_PRESS), std::bind(&Core::actor::AddVector, &Sprite, vec3f(0.f, 0.f, -1.f)));
-	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_D, GLFW_PRESS), std::bind(&Core::actor::AddVector, &Sprite, vec3f(1.f, 0.f, 0.f)));
+	//SpriteInputComponent->Init();
+	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(TE::Core::W, TE::Core::PRESS), std::bind(&Core::actor::AddVector, Sprite, vec3f(0.f, 1.f, 0.f)));
+	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(TE::Core::A, TE::Core::PRESS), std::bind(&Core::actor::AddVector, Sprite, vec3f(-1.f, 0.f, 0.f)));
+	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(TE::Core::S, TE::Core::PRESS), std::bind(&Core::actor::AddVector, Sprite, vec3f(0.f, -1.f, 0.f)));
+	SpriteInputComponent->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), std::bind(&Core::actor::AddVector, Sprite, vec3f(1.f, 0.f, 0.f)));
 	//SpriteInputComponent->AddCursorBind(std::bind(&Renderer::camera_actor::HandleCursor, &FreeCam, std::placeholders::_1, std::placeholders::_2));
-	SpriteInputComponent->SetupAttachement(Sprite.GetRoot());
+	SpriteInputComponent->SetupAttachement(Sprite->GetRoot());
 	// Camera component centered on the sprite 
 	Renderer::camera_component CameraComponent;
-	CameraComponent.SetLocalPosition({ 0, 10, 0 });
+	CameraComponent.SetLocalPosition({ 0, -1, 0 });
 	Renderer::camera_properties CameraProperties = {};
 	CameraProperties.AspectRatio = (float)TE::Window->GetWidth() / TE::Window->GetHeight();
 	CameraComponent.SetCameraProperty(CameraProperties);
-	CameraComponent.SetupAttachement(Sprite.GetRoot());
+	CameraComponent.SetupAttachement(Sprite->GetRoot());
 
 	vector<const GLchar*> faces;
 	faces.push_back("../assets/skyboxes/Test/xpos.png");
@@ -106,23 +108,24 @@ int main(int argc, char** argv)
 	Skybox* skybox = new Skybox(faces);
 
 
-	Renderer::camera_actor FreeCam({ 0, 10, 0 });
+	Renderer::camera_actor FreeCam({ 0, -2, 0 });
 	FreeCam.SetCameraProperty(CameraProperties);
 	std::shared_ptr<Core::input_component> FreeCamInput = std::make_shared<Core::input_component>();
-	//FreeCamInput->Init();
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_W, GLFW_PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, 0.f, 1.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_A, GLFW_PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(-1.f, 0.f, 0.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_S, GLFW_PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, 0.f, -1.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(GLFW_KEY_D, GLFW_PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(1.f, 0.f, 0.f)));
+	FreeCamInput->Init();
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::W, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, 1.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::A, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(-1.f, 0.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::S, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, -1.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(1.f, 0.f, 0.f)));
 	FreeCamInput->AddCursorBind(std::bind(&Renderer::camera_actor::HandleCursor, &FreeCam, std::placeholders::_1, std::placeholders::_2));
 	FreeCamInput->SetupAttachement(FreeCam.GetRoot());
 
 	//Background Sprite
-	Core::actor SpriteBackground;
+	std::shared_ptr<Core::actor> SpriteBackground = std::make_shared<Core::actor>();
 	// Sprite component
 	Renderer::sprite SpriteBackgroundComponent(Test);
-	SpriteBackgroundComponent.SetupAttachement(SpriteBackground.GetRoot());
 	SpriteBackgroundComponent.SetSize({ 20.f, 20.f });
+	SpriteBackgroundComponent.SetupAttachement(SpriteBackground->GetRoot());
+
 
 
 	//Geometry
@@ -150,25 +153,43 @@ int main(int argc, char** argv)
 	BlitShader.Attach(Renderer::shader::type::FRAGMENT, "../assets/shaders/blit.frag");
 	BlitShader.Link();
 
+	// TODO (MArc) : Make an object "Renderer" so we can enable/disable option directly on it
+	// Maybe even register the renderable objects
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
 	glClearColor(0.f, 1.f, 0.0f, 1.f);
+
+	//Physic
+	Physic::bvh_object_list SceneActors;
+	SceneActors.push_back(Sprite);
+	SceneActors.push_back(SpriteBackground);
+	// BVH construction
+	Physic::bvh SceneTree(SceneActors);
+	// Ray intersection
+	Physic::ray Ray;
+	Ray.Origin = Math::vec3f(0.f, -2.f, 0.f);
+	Ray.Direction = Math::vec3f( 0.f, 1.f, 0.f );
+	Ray.InverseDirection = 1.f / Ray.Direction;
+	Ray.T = 1000000;
+	SceneTree.GetIntersection(Ray);
+
 
 	//Main loop
 	while (Continue)
 	{
 		//Matrices
-		mat4f View = CameraComponent.GetView();
-		mat4f Projection = CameraComponent.GetProjection();
+		mat4f View = FreeCam.GetView();
+		mat4f Projection = FreeCam.GetProjection();
 		mat4f MV = Projection * View;
-		mat4f MVP = MV;
+		mat4f MVP = MV;		
 
 		glViewport(0, 0, TE::Window->GetWidth(), TE::Window->GetHeight());
 		TE::GBufferFBO->Bind();
 		glClearColor(0.f, 1.f, 0.0f, 1.f);
 		TE::GBufferFBO->Clear();
 
-		Sprite.Render( Projection, View );
-		SpriteBackground.Render(Projection, View);
+		Sprite->Render( Projection, View );
+		SpriteBackground->Render(Projection, View);
 
 		View = glm::mat4(glm::mat3(FreeCam.GetView()));    // Remove any translation component of the view matrix
 		//skybox->display(View, Projection, TE::GBufferFBO->GetDepthTextureID(), TE::Window->GetWidth(), TE::Window->GetHeight());

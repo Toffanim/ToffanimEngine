@@ -73,8 +73,9 @@ namespace TE
 				return(_Axis);
 			}
 
-		protected:
 			void ExtendBoundingBox(bounding_box NewItemBoundingBox);
+		
+		protected:			
 			void UpdateAxis();
 
 			component* _Root;

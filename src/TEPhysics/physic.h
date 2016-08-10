@@ -9,4 +9,6 @@ $Notice: $
 
 #define PHYSIC_H
 
+#include "bvh.h"
+
 #endif

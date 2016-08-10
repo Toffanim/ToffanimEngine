@@ -33,6 +33,7 @@ namespace TE
 			Math::vec2f GetSize() const;
 			void Tick(float DeltaTime) override {};
 			void Render(Math::mat4f Projection, Math::mat4f View) override;
+			void SetupAttachement(component* Parent) override;
 
 		private:
 			Core::texture2D* _Texture;

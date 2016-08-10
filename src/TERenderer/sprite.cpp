@@ -29,6 +29,17 @@ namespace TE
 			return (_Size);
 		}
 
+		void sprite::SetupAttachement(component* Parent)
+		{
+			component_CRTP<sprite>::SetupAttachement(Parent);
+			Math::axis3 Axis = _Owner->GetAxis();
+			Math::vec3f SpriteCenter = _Owner->GetPosition();
+			TE::Math::bounding_box BB;
+			BB.LowerBound = Math::vec3f(SpriteCenter - (Axis.Right*_Size.x) - (Axis.Up*_Size.y));
+			BB.UpperBound = Math::vec3f(SpriteCenter + (Axis.Right*_Size.x) + (Axis.Up*_Size.y));
+			Parent->GetOwner()->ExtendBoundingBox(BB);
+		}
+
 		void sprite::Render( Math::mat4f Projection, Math::mat4f View )
 		{		
 			if (_Owner)
@@ -41,19 +52,19 @@ namespace TE
 				NewVertex = SpriteCenter - (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 0.f, 0.f } });
+				{ 0.f, 1.f } });
 				NewVertex = SpriteCenter + (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 0.f, 1.f } });
+				{ 1.f, 1.f } });
 				NewVertex = SpriteCenter - (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 1.f, 0.f } });
+				{ 0.f, 0.f } });
 				NewVertex = SpriteCenter + (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
 				{ 0.f, 0.f, 1.f },
-				{ 1.f, 1.f } });
+				{ 1.f, 0.f } });
 
 				if (_Quad)
 					_Quad->Update(Vertices);
