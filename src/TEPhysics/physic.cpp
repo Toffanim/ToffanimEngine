@@ -50,6 +50,7 @@ namespace TE
 
 			return true;
 		}
+
 		int AirEvolution(TE::Core::actor & CoreActorA, CVector ActorLocalGravity)
 		{
 			/* Require a actor object (both core and game)  and the map gravity matrix (or equivalent) 
@@ -120,5 +121,62 @@ namespace TE
 
 			}
 		
+		float SpinEvolution(TE::Core::actor  CoreActorA)
+		{
+			/* Require a actor object (both core and game)  
+			Function is updating evolutiontracer
+			Will return small rotation displacement of the actor */
+
+
+
+			/*
+			*
+			*
+			*
+			*/
+			// temporary shits for code adaptation to be remove after actor class rebuild 
+
+
+			// Game Actor datas
+			bool JumpFlag, SpinFlag, SlamFlag, DoubleJumpFlag, DoubleJumpRequestFlag;
+			float ActorInitialVerticalSpeed, ActorInitialSpinSpeed;
+
+			// Core Actor datas
+			CVector ActorCurrentXYSpeed;
+			CVector Center;
+			float ActorCurrentSpinSpeed;
+			int JumpEvolutionTracer, SpinEvolutionTracer;
+			// physics constants
+			double sTimeConstant = 0.016;
+
+			// dont know data storage
+			float ActorMass, ActorCollisionRestitutionCoefficient;
+
+
+			// end of temporary declarations
+			/*
+			*
+			*
+			*
+			*/
+
+
+
+			float DeltaActorAngularSpin = 0;
+			float SpinTime = 0;
+
+			if (SpinFlag == true)
+			{
+				// Calculating spin statut in timescale
+				SpinTime = float(SpinEvolutionTracer)*float(sTimeConstant);
+				// Calculating Actor Spin speed evolution
+				ActorCurrentSpinSpeed = ActorInitialSpinSpeed*exp((-1 * SpinTime) / ActorMass);
+				// Calculation Actor DeltaR
+				DeltaActorAngularSpin = sTimeConstant* ActorCurrentSpinSpeed;
+				// Updating time evolution
+				SpinEvolutionTracer++;
+			}
+			return	DeltaActorAngularSpin;
+		}
 	}
 }
