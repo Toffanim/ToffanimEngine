@@ -46,7 +46,7 @@ namespace TE
 			UpdateAxis();
 		}
 
-		void actor::AddRotation(double Yaw, double Pitch, double Roll)
+		void actor::AddRotation(double Roll, double Pitch, double Yaw)
 		{
 			float Tmp = fmod(_Rotation.Roll + Roll, 360);
 			_Rotation.Roll = Tmp;

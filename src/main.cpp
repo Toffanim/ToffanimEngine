@@ -15,10 +15,11 @@ using namespace TE;// <= Using namesapce TE to save time
 #include "Skybox.h"
 //TODO(Marc)
 
-//Get GLFW 3.2
-//Get GLEW MX to be able to have multiple window with multiple context (thread safe) ??
-
-//Check rotation in good coordinate system
+// ------ Multiple window with multiple contexts ------
+// Get GLFW 3.2
+// Get GLEW MX to be able to have multiple window with multiple context (thread safe) ??
+// ------ Coordinate system ------
+//Check rotations in good coordinate system
 
 
 static bool Continue = true;
@@ -174,6 +175,12 @@ int main(int argc, char** argv)
 	SceneTree.GetIntersection(Ray);
 
 
+	std::shared_ptr<Core::input_component> WindowController = std::make_shared<Core::input_component>();
+	WindowController->Init();
+	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::ESCAPE, TE::Core::PRESS), &CloseApp);
+	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_1, TE::Core::PRESS), std::bind(&Core::window::SetFullScreen, Window));
+	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_2, TE::Core::PRESS), std::bind(&Core::window::SetWindowed, Window));
+
 	//Main loop
 	while (Continue)
 	{
@@ -188,19 +195,19 @@ int main(int argc, char** argv)
 		glClearColor(0.f, 1.f, 0.0f, 1.f);
 		TE::GBufferFBO->Clear();
 
+		// Render Atmosphere
+		mat4f ViewNoTrans = glm::mat4(glm::mat3(FreeCam.GetView()));    // Remove any translation component of the view matrix
+		skybox->display(ViewNoTrans, Projection);
+		TE::GBufferFBO->Clear(Core::frame_buffer::CLEAR_DEPTH);
+		//Render scene geometry
 		Sprite->Render( Projection, View );
 		SpriteBackground->Render(Projection, View);
 
-		View = glm::mat4(glm::mat3(FreeCam.GetView()));    // Remove any translation component of the view matrix
-		//skybox->display(View, Projection, TE::GBufferFBO->GetDepthTextureID(), TE::Window->GetWidth(), TE::Window->GetHeight());
-
-
-		//Clean FBOs
+		//Clean default FBOs
 		Core::frame_buffer::BindDefaultFBO();
 		glClearColor(0.f, 1.f, 1.f, 1.f);
 		Core::frame_buffer::ClearDefaultFBO();
-
-		glViewport(0, 0, TE::Window->GetWidth() / 2, TE::Window->GetHeight() / 2);
+		// Blit from GBuffer to default FBO
 		BlitShader.Bind();
 		BlitShader.SetInt("Texture", 0);
 		glActiveTexture(GL_TEXTURE0);

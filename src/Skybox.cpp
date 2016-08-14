@@ -116,7 +116,7 @@ GLuint Skybox::loadCubemap(const vector<const GLchar*>& faces)
 }
 
 
-void Skybox::display( glm::mat4 view, glm::mat4 proj, GLuint depth, int screenWidth, int screenHeight)
+void Skybox::display( glm::mat4 view, glm::mat4 proj)
 {
     //glDisable(GL_DEPTH_TEST);
         Shader->Bind();   
@@ -128,12 +128,7 @@ void Skybox::display( glm::mat4 view, glm::mat4 proj, GLuint depth, int screenWi
         glActiveTexture(GL_TEXTURE0);
 		Shader->SetInt("skybox", 0);
         glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id);
-        glActiveTexture(GL_TEXTURE1);
-		Shader->SetInt("DepthBuffer", 1);
-		glm::vec2 ScreenSize = { screenWidth, screenHeight };
-		Shader->SetVector2("screeSize", ScreenSize);
-        glBindTexture(GL_TEXTURE_2D, depth);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindVertexArray(0);
-        glDepthFunc(GL_LESS); // Set depth function back to default
+        //glDepthFunc(GL_LESS); // Set depth function back to default
 }

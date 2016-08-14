@@ -34,7 +34,17 @@ namespace TE
 			xoff *= sensitivity;
 			yoff *= -sensitivity;
 
-			AddRotation(-xoff,0, yoff);
+			if (_Rotation.Roll + yoff > 89)
+			{
+				yoff = 89 - _Rotation.Roll;
+			}
+
+			if (_Rotation.Roll + yoff < -89)
+			{
+				yoff = -89 - _Rotation.Roll;
+			}
+
+			AddRotation(yoff,0, -xoff);
 		}
 
 		mat4f camera_actor::GetView()
