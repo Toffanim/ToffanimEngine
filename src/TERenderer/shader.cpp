@@ -102,6 +102,11 @@ namespace TE
 			glUniform1f(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), Value);
 			Core::CheckOpenGLError("Error trying to set float");
 		}
+		void shader::SetVector2(const std::string& UniformName, const glm::vec2& Value) const
+		{
+			glUniform2fv(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), 1, &Value[0]);
+			Core::CheckOpenGLError("Error trying to set vector3");
+		}
 		void shader::SetVector3(const std::string& UniformName, const glm::vec3& Value) const
 		{
 			glUniform3fv(glGetUniformLocation(_ProgramHandle, UniformName.c_str()), 1, &Value[0]);

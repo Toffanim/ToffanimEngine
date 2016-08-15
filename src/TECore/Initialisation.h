@@ -59,7 +59,7 @@ namespace TE
 		printf("     RENDERER: %s\n", glGetString(GL_RENDERER));
 		printf("GLSL VERSION : %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 		TE::GBufferFBO = new Core::frame_buffer(TE::ScreenWidth, TE::ScreenHeight);
-		TE::GBufferFBO->AddDrawBuffer("Color", Core::frame_buffer::attachment::COLOR0,
+		TE::GBufferFBO->AddDrawBuffer("Colors", Core::frame_buffer::attachment::COLOR0,
 			Core::texture2D::base_internal_format::RGBA,
 			Core::texture2D::sized_internal_format::RGBA32F,
 			Core::texture2D::data_type::FLOAT);

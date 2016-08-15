@@ -35,6 +35,28 @@ namespace TE
 			_Position += Vector;
 		}
 
+		void actor::AddRotation(vec3f Rotation)
+		{
+			float Tmp = fmod(_Rotation.Roll + Rotation.x, 360);
+			_Rotation.Roll = Tmp;
+			Tmp = fmod(_Rotation.Pitch + Rotation.y, 360);
+			_Rotation.Pitch = Tmp;
+			Tmp = fmod(_Rotation.Yaw + Rotation.z, 360);
+			_Rotation.Yaw = Tmp;
+			UpdateAxis();
+		}
+
+		void actor::AddRotation(double Yaw, double Pitch, double Roll)
+		{
+			float Tmp = fmod(_Rotation.Roll + Roll, 360);
+			_Rotation.Roll = Tmp;
+			Tmp = fmod(_Rotation.Pitch + Pitch, 360);
+			_Rotation.Pitch = Tmp;
+			Tmp = fmod(_Rotation.Yaw + Yaw, 360);
+			_Rotation.Yaw = Tmp;
+			UpdateAxis();
+		}
+
 		void actor::ExtendBoundingBox(bounding_box NewItemBoundingBox)
 		{
 			_BoundingBox.LowerBound.x = (NewItemBoundingBox.LowerBound.x < _BoundingBox.LowerBound.x) ? NewItemBoundingBox.LowerBound.x : _BoundingBox.LowerBound.x;
@@ -44,6 +66,16 @@ namespace TE
 			_BoundingBox.UpperBound.x = (NewItemBoundingBox.UpperBound.x > _BoundingBox.UpperBound.x) ? NewItemBoundingBox.UpperBound.x : _BoundingBox.UpperBound.x;
 			_BoundingBox.UpperBound.y = (NewItemBoundingBox.UpperBound.y > _BoundingBox.UpperBound.y) ? NewItemBoundingBox.UpperBound.y : _BoundingBox.UpperBound.y;
 			_BoundingBox.UpperBound.z = (NewItemBoundingBox.UpperBound.z > _BoundingBox.UpperBound.z) ? NewItemBoundingBox.UpperBound.z : _BoundingBox.UpperBound.z;
+		}
+
+		void actor::UpdateAxis()
+		{
+			axis3 DefaultAxis;
+			Math::quaternion Quat = Math::RotationAsQuaternion(_Rotation);
+			Math::mat3f Rotation = Quat.AsRotationMatrix();
+			_Axis.Front = DefaultAxis.Front * Rotation;
+			_Axis.Right = DefaultAxis.Right * Rotation;
+			_Axis.Up = DefaultAxis.Up * Rotation;
 		}
 	}
 }

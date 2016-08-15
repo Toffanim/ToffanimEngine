@@ -19,6 +19,7 @@ namespace TE
 		void vertex_buffer::Update(std::vector<Core::vertex> NewVertices)
 		{
 			//NOTE: Test if NEwVertices.size() != Vertices.soze();
+			Bind();
 			glBufferData(GL_ARRAY_BUFFER, sizeof(Core::vertex) * NewVertices.size(), NULL, GL_STATIC_DRAW);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(Core::vertex) * NewVertices.size(), &NewVertices[0], GL_STATIC_DRAW);
 		}

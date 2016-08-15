@@ -12,5 +12,6 @@ $Notice: $
 #include "shader.h"
 #include "camera_actor.h"
 #include "sprite.h"
+#include "camera_component.h"
 
 #endif

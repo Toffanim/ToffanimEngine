@@ -57,8 +57,8 @@ Skybox::Skybox( const vector<const GLchar*>& faces )
     };    
 
     Shader = new TE::Renderer::shader("Skybox shader");
-	Shader->Attach(TE::Renderer::shader::type::VERTEX, "assets/shaders/skybox.vert");
-	Shader->Attach(TE::Renderer::shader::type::VERTEX, "assets/shaders/skybox.frag");
+	Shader->Attach(TE::Renderer::shader::type::VERTEX, "../assets/shaders/skybox.vert");
+	Shader->Attach(TE::Renderer::shader::type::FRAGMENT, "../assets/shaders/skybox.frag");
     Shader->Link();
     
     glGenVertexArrays(1, &VAO);

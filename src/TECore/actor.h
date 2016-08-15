@@ -53,12 +53,13 @@ namespace TE
 
 			void AddVector(vec3f Vector);
 			void AddRotation(vec3f Rotation);
+			void AddRotation(double Yaw, double Pitch, double Roll);
 			void AddScale(vec3f Scale);
 			void Transform(vec3f Translation,
 				vec3f Rotation,
 				vec3f Scale);
 
-			component* Root() const {
+			component* GetRoot() const {
 				return(_Root);
 			};
 
@@ -67,8 +68,15 @@ namespace TE
 				return(_BoundingBox);
 			}
 
-		protected:
+			Math::axis3 GetAxis() const
+			{
+				return(_Axis);
+			}
+
 			void ExtendBoundingBox(bounding_box NewItemBoundingBox);
+		
+		protected:			
+			void UpdateAxis();
 
 			component* _Root;
 			std::vector< component* > _Childs;

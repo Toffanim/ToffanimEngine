@@ -22,5 +22,6 @@ $Notice: $
 #include "vertex.h"
 #include "vertex_array.h"
 #include "vertex_buffer.h"
+#include "inputs.h"
 
 #endif

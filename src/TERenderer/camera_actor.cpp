@@ -16,6 +16,27 @@ namespace TE
 		{
 		}
 
+		void camera_actor::HandleCursor(double xpos, double ypos)
+		{
+			if (_IsFirstTime)
+			{
+				_LastX = xpos;
+				_LastY = ypos;
+				_IsFirstTime = false;
+			}
+
+			int xoff = xpos - _LastX;
+			int yoff = ypos - _LastY;
+			_LastX = xpos;
+			_LastY = ypos;
+
+			float sensitivity = 0.5f;
+			xoff *= sensitivity;
+			yoff *= -sensitivity;
+
+			AddRotation(-xoff,0, yoff);
+		}
+
 		mat4f camera_actor::GetView()
 		{
 			return glm::lookAt(_Position, _Position + _Axis.Front , _Axis.Up);
