@@ -86,9 +86,9 @@ namespace TE
 
 		void frame_buffer::Clear(clear_type Type)
 		{
-			//Bind();
-			//glClear(Type);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			Bind();
+			glClear(Type);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		};
 	}
 }

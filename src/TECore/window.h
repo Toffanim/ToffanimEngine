@@ -15,14 +15,40 @@ $Notice: $
 #include "utils.h"
 #include "input_handler.h"
 
+
+/*! \file window.h
+\brief Window creation and management
+
+*/
+
 namespace TE
 {
 	namespace Core
 	{
+		/*!
+		window is the class used to create a window with an opengl context.
+		The window has severals properties : resizable, fullscreen, windowed, etc
+
+		IMPORTANT : For now you can only create one window per application, because we can't correctly create multiple opengl contexts.
+		To avoid this problem we should switch to GLFW 3.2 and GLEW MX
+		*/
 		class window
 		{
 		public:
-			window(int Width, int Height, const char* Title = "Default");
+			/*!
+			window ctor 
+			\param Width Desired window width
+			\param Height Desired window height
+			\param Title Desired window title, defaulted as "Default"
+			*/
+			window(int Width, int Height, std::string Title = "Default");
+
+			static void ResizeCallback(GLFWwindow* Window, int width, int height)
+			{
+				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(Window));
+				_Window->SetWidth( width );
+				_Window->SetHeight( height );
+			}
 
 			bool IsResizable() const 
 			{ 
@@ -47,6 +73,17 @@ namespace TE
 				return(_WindowHandle);
 			}
 
+
+			void SetWidth(int Width)
+			{
+				_Width = Width;
+			}
+
+			void SetHeight(int Height)
+			{
+				_Height = Height;
+			}
+
 			int GetWidth() const
 			{
 				return(_Width);
@@ -56,6 +93,9 @@ namespace TE
 			{
 				return(_Height);
 			}
+
+			void HideCursor() const;
+			void ShowCursor() const;
 
 			void BindInputHandler() const
 			{				
@@ -67,10 +107,12 @@ namespace TE
 			~window();
 
 		private:
+			std::string _Title;
 			int _Width;
 			int _Height;
 			bool _IsResizable;
 			bool _IsVerticalSyncOn;
+			bool _IsFullscreen;
 			GLFWwindow* _WindowHandle;
 		};
 	}
