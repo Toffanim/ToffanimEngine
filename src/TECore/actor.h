@@ -28,7 +28,7 @@ namespace TE
 			actor();
 			actor(vec3f Position);
 
-			~actor();
+			virtual ~actor();
 
 			//Called the first time the actor is actually rendered in the scene
 			virtual void BeginTick() {};

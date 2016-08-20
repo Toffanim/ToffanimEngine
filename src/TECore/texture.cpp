@@ -18,14 +18,14 @@ namespace TE
 			_RawData(nullptr)
 		{
 			int comp;
-			_RawData = stbi_load(_Path.c_str(), &_Width, &_Height, &comp, 3);
+			_RawData = std::unique_ptr<unsigned char>(stbi_load(_Path.c_str(), &_Width, &_Height, &comp, 3));
 			if (_RawData)
 			{
 				glGenTextures(1, &_ID);
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, _ID);
 				//IMPORTANT(Marc) : Ajout du param pour choisir le format interne
-				CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height, _RawData);
+				CreateTexture(_ID, _SizedInternalFormat, _BaseInternalFormat, _DataType, _Width, _Height, _RawData.get());
 				glBindTexture(GL_TEXTURE_2D, 0);
 			}
 			else
@@ -58,7 +58,6 @@ namespace TE
 
 		texture2D::~texture2D()
 		{
-			delete[] _RawData;
 			glDeleteTextures(1, &_ID);
 		}
 

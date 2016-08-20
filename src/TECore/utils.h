@@ -13,6 +13,10 @@ $Notice: $
 #include <string>
 #include "GL/glew.h"
 
+#define NON_COPYABLE_CLASS(Class) \
+Class(const Class&) = delete;\
+Class& operator=(const Class&) = delete;
+
 namespace TE
 {
 	namespace Core

@@ -25,6 +25,7 @@ $Notice: $
 #include "frame_buffer.h"
 #include "TERenderer\shader.h"
 #include "globals.h"
+#include "TEDebug\debug.h"
 
 namespace TE
 {
@@ -32,7 +33,7 @@ namespace TE
 	unsigned int TE::ScreenHeight;
 	Core::input_handler* TE::DefaultInputHandler;
 	Core::window* TE::Window;
-	Core::frame_buffer * TE::GBufferFBO;
+	Core::frame_buffer* TE::GBufferFBO;
 	Renderer::shader* TE::GBufferShader;
 	//TODO(Marc) : Make this return a value for error or success
 	//Initialize third party like GLFW, SDL, GLEW, etc
@@ -84,6 +85,15 @@ namespace TE
 		}
 		Core::CheckOpenGLError("Destroy Window");
 	}
+
+	void TE_Clean()
+	{
+		delete TE::DefaultInputHandler;
+		delete TE::Window;
+		delete TE::GBufferFBO;
+		delete TE::GBufferShader;
+	}
+
 }
 
 #endif

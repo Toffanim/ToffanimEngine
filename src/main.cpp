@@ -32,6 +32,8 @@ void CloseApp()
 //Launch game
 int main(int argc, char** argv)
 {
+
+#if 1
 	// TE_Init() : Init every global variables, creating a window, some fbos and shaders
 	//
 	// Window creation example
@@ -220,5 +222,9 @@ int main(int argc, char** argv)
 		TE::Window->SwapBuffers();
 		Core::CheckOpenGLError("end frame");
 	}
+
+	delete skybox;
+#endif
+	TE_Clean();
     return(0);
 }

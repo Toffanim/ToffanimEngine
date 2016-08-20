@@ -12,18 +12,19 @@ $Notice: $
 #include <string>
 #include <iostream>
 #include <GL/glew.h>
+#include <memory>
+
 #include "stb_image.h"
+#include "utils.h"
 
 namespace TE
 {
 	namespace Core
 	{
-
-
-
 		class texture2D
 		{
 		public:
+			NON_COPYABLE_CLASS(texture2D);
 
 			enum sized_internal_format
 			{
@@ -102,7 +103,7 @@ namespace TE
 			base_internal_format _BaseInternalFormat;
 			sized_internal_format _SizedInternalFormat;
 			data_type _DataType;
-			unsigned char * _RawData;
+			std::unique_ptr<unsigned char> _RawData;
 		};
 	}
 }

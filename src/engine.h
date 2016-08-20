@@ -15,4 +15,8 @@ $Notice: $
 #include "TEPhysics\physic.h"
 #include "TEGame\game.h"
 
+#if !defined(NDEBUG)
+#include "TEDebug\debug.h"
+#endif
+
 #endif

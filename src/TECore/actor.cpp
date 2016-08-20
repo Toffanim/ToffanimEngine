@@ -18,6 +18,11 @@ namespace TE
 
 		actor::~actor()
 		{
+			for (auto Child : _Childs)
+			{
+				if (Child)
+					delete Child;
+			}
 		}
 
 		vec3f actor::GetPosition()
