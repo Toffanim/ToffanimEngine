@@ -30,9 +30,25 @@ void CloseApp()
 	Continue = false;
 }
 
+void BindImGuiCallbacks()
+{
+	glfwSetMouseButtonCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_MouseButtonCallback);
+	glfwSetScrollCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_ScrollCallback);
+	glfwSetKeyCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_KeyCallback);
+	glfwSetCharCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_CharCallback);
+}
+
 void ToggleDebugMode()
 {
-	DebugMode = true;
+	DebugMode = !DebugMode;
+	if (DebugMode)
+	{
+		BindImGuiCallbacks();
+	}
+	else
+	{
+		TE::Window->BindInputHandler();
+	}
 }
 
 //Launch game
@@ -226,8 +242,24 @@ int main(int argc, char** argv)
 
 		if (DebugMode)
 		{
-			ImGui::NewFrame();
+			ImGui_ImplGlfwGL3_NewFrame();
+			ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
+			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
+			if (ImGui::IsMouseHoveringAnyWindow())
+			{
+				BindImGuiCallbacks();
+			}
+			else
+			{
+				TE::Window->BindInputHandler();
+			}
+
+			ImGui::Render();
+		}
+		else
+		{
+			ImGui_ImplGlfwGL3_NewFrame();
 			ImGui::Render();
 		}
 		

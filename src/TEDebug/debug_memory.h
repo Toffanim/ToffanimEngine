@@ -42,21 +42,18 @@ namespace TE
 		{
 			if (Size <= 0)
 				throw std::runtime_error("Trying to malloc zero sized object");
+			auto SizeOffset = 0;
 #if _CHECK_HEAP_CORRUPTION
-			Size += _CHECK_HEAP_LENGTH;
+			SizeOffset = _CHECK_HEAP_LENGTH;
 #endif
-			void* Ptr = malloc(Size);
+			void* Ptr = malloc(Size + SizeOffset);
 			if (Ptr)
 			{
-<<<<<<< HEAD
 #if _CHECK_HEAP_CORRUPTION
-				memset((char*)Ptr + Size - _CHECK_HEAP_LENGTH, _CHECK_HEAP_CHAR, _CHECK_HEAP_LENGTH);
+				memset((char*)Ptr + Size, _CHECK_HEAP_CHAR, _CHECK_HEAP_LENGTH);
 #endif
-				simple_file_locator SFL{ Size - _CHECK_HEAP_LENGTH, File, Line, IsArray };
-=======
 				simple_file_locator SFL{ Size, File, Line, IsArray };
 				MemoryUsed += Size;
->>>>>>> origin/master
 				MemoryMap[Ptr] = SFL;
 				return (Ptr);
 			}
@@ -87,14 +84,9 @@ namespace TE
 						if (IsArray)
 						    std::cerr << "Using delete[] on new" << std::endl;
 						else
-<<<<<<< HEAD
 					        std::cerr << "Using delete on new[]" << std::endl;
-					MemoryMap.erase(It);
-=======
-					        std::cerr << "Using delete on new[]" << endl;
 					MemoryUsed -= It->second.Size;
 					MemoryMap.erase(It);					
->>>>>>> origin/master
 				}
 			}
 			free(Ptr);
@@ -186,6 +178,18 @@ inline
 void* operator new[](size_t Size, const char* File, int Line)
 {
 	return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, true));
+}
+
+inline
+void operator delete(void* Ptr, const char* File, int Line)
+{
+	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, false);
+}
+
+inline
+void operator delete[](void* Ptr, const char* File, int Line)
+{
+	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, true);
 }
 
 

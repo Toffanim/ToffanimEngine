@@ -20,7 +20,7 @@ struct debug_event
 };
 
 typedef std::vector<debug_event> debug_event_list;
-extern debug_event_list GlobalDebugEventList;
+static debug_event_list GlobalDebugEventList;
 
 void RecordBeginEvent(const char* GUID)
 {
