@@ -13,8 +13,10 @@ $Notice: $
 
 #define USE_GLFW
 
+#include "imgui.h"
 #if defined(USE_GLFW)
 #include "GLFW/glfw3.h"
+#include "examples\opengl3_example\imgui_impl_glfw_gl3.h"
 #endif
 
 #include <stdlib.h>
@@ -83,6 +85,10 @@ namespace TE
 				"Please update your drivers and/or buy a better graphics card."
 				);
 		}
+
+#if defined(USE_GLFW)
+		ImGui_ImplGlfwGL3_Init(Window->GetHandle(), true);
+#endif
 		Core::CheckOpenGLError("Destroy Window");
 	}
 

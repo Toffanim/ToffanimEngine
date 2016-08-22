@@ -23,10 +23,16 @@ using namespace TE;// <= Using namesapce TE to save time
 
 
 static bool Continue = true;
+static bool DebugMode = false;
 
 void CloseApp()
 {
 	Continue = false;
+}
+
+void ToggleDebugMode()
+{
+	DebugMode = true;
 }
 
 //Launch game
@@ -182,6 +188,7 @@ int main(int argc, char** argv)
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::ESCAPE, TE::Core::PRESS), &CloseApp);
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_1, TE::Core::PRESS), std::bind(&Core::window::SetFullScreen, Window));
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_2, TE::Core::PRESS), std::bind(&Core::window::SetWindowed, Window));
+	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), &ToggleDebugMode);
 
 	//Main loop
 	while (Continue)
@@ -217,6 +224,13 @@ int main(int argc, char** argv)
 		//TE::GBufferFBO->BindTexture("Normals");
 		//TE::GBufferFBO->BindDepthTexture();
 		UnitQuad.Render();
+
+		if (DebugMode)
+		{
+			ImGui::NewFrame();
+
+			ImGui::Render();
+		}
 		
 
 		TE::Window->SwapBuffers();

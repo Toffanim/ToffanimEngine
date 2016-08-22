@@ -1,4 +1,4 @@
-#if !defined(DEBUG_H)
+#if !defined(DEBUG_UI_H)
 /* ========================================================================
 $File: $
 $Date: $
@@ -7,10 +7,15 @@ $Creator:  $
 $Notice: $
 ======================================================================== */
 
-#define DEBUG_H
-
-#include "debug_memory.h"
+#define DEBUG_UI_H
 #include "debug_functions.h"
-#include "debug_ui.h"
+#include "debug_memory.h"
+#include "TECore\Initialisation.h"
+
+
+
+
+
+
 
 #endif

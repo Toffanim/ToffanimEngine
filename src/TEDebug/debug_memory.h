@@ -33,6 +33,7 @@ namespace TE
 			return (SMM);
 		}
 		std::map<void*, simple_file_locator > MemoryMap;
+		size_t MemoryUsed = 0;
 
 		void* Alloc(size_t Size, const char* File, int Line, bool IsArray)
 		{
@@ -42,6 +43,7 @@ namespace TE
 			if (Ptr)
 			{
 				simple_file_locator SFL{ Size, File, Line, IsArray };
+				MemoryUsed += Size;
 				MemoryMap[Ptr] = SFL;
 				return (Ptr);
 			}
@@ -73,7 +75,8 @@ namespace TE
 						    std::cerr << "Using delete[] on new" << endl;
 						else
 					        std::cerr << "Using delete on new[]" << endl;
-					MemoryMap.erase(It);
+					MemoryUsed -= It->second.Size;
+					MemoryMap.erase(It);					
 				}
 			}
 			free(Ptr);
