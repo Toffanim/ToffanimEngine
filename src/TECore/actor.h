@@ -52,6 +52,7 @@ namespace TE
 			void SetLocalPosition(vec3f NewPosition );
 
 			void AddVector(vec3f Vector);
+			void AddLocalVector(vec3f Vector);
 			void AddRotation(vec3f Rotation);
 			void AddRotation(double Yaw, double Pitch, double Roll);
 			void AddScale(vec3f Scale);

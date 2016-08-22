@@ -87,7 +87,7 @@ namespace TE
 		}
 
 #if defined(USE_GLFW)
-		ImGui_ImplGlfwGL3_Init(Window->GetHandle(), true);
+		ImGui_ImplGlfwGL3_Init(Window->GetHandle(), false);
 #endif
 		Core::CheckOpenGLError("Destroy Window");
 	}

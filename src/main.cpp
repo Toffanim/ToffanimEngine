@@ -36,6 +36,7 @@ void BindImGuiCallbacks()
 	glfwSetScrollCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_ScrollCallback);
 	glfwSetKeyCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_KeyCallback);
 	glfwSetCharCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_CharCallback);
+	glfwSetCursorPosCallback(TE::Window->GetHandle(), NULL);
 }
 
 void ToggleDebugMode()
@@ -43,10 +44,12 @@ void ToggleDebugMode()
 	DebugMode = !DebugMode;
 	if (DebugMode)
 	{
+		TE::Window->ShowCursor();
 		BindImGuiCallbacks();
 	}
 	else
 	{
+		TE::Window->HideCursor();
 		TE::Window->BindInputHandler();
 	}
 }
@@ -136,10 +139,10 @@ int main(int argc, char** argv)
 	FreeCam.SetCameraProperty(CameraProperties);
 	std::shared_ptr<Core::input_component> FreeCamInput = std::make_shared<Core::input_component>();
 	FreeCamInput->Init();
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::W, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, 1.f, 0.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::A, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(-1.f, 0.f, 0.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::S, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(0.f, -1.f, 0.f)));
-	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), std::bind(&Core::actor::AddVector, &FreeCam, vec3f(1.f, 0.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::W, TE::Core::PRESS), std::bind(&Core::actor::AddLocalVector, &FreeCam, vec3f(0.f, 1.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::A, TE::Core::PRESS), std::bind(&Core::actor::AddLocalVector, &FreeCam, vec3f(-1.f, 0.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::S, TE::Core::PRESS), std::bind(&Core::actor::AddLocalVector, &FreeCam, vec3f(0.f, -1.f, 0.f)));
+	FreeCamInput->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), std::bind(&Core::actor::AddLocalVector, &FreeCam, vec3f(1.f, 0.f, 0.f)));
 	FreeCamInput->AddCursorBind(std::bind(&Renderer::camera_actor::HandleCursor, &FreeCam, std::placeholders::_1, std::placeholders::_2));
 	FreeCamInput->SetupAttachement(FreeCam.GetRoot());
 
@@ -203,7 +206,7 @@ int main(int argc, char** argv)
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::ESCAPE, TE::Core::PRESS), &CloseApp);
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_1, TE::Core::PRESS), std::bind(&Core::window::SetFullScreen, Window));
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_2, TE::Core::PRESS), std::bind(&Core::window::SetWindowed, Window));
-	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::D, TE::Core::PRESS), &ToggleDebugMode);
+	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_3, TE::Core::PRESS), &ToggleDebugMode);
 
 	//Main loop
 	while (Continue)

@@ -40,6 +40,12 @@ namespace TE
 			_Position += Vector;
 		}
 
+		void actor::AddLocalVector(vec3f Vector)
+		{   
+			auto AllAxis = Vector.x * _Axis.Right + Vector.y * _Axis.Front + Vector.z * _Axis.Up;
+			_Position += AllAxis;
+		}
+
 		void actor::AddRotation(vec3f Rotation)
 		{
 			float Tmp = fmod(_Rotation.Roll + Rotation.x, 360);

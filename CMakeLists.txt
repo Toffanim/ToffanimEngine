@@ -107,7 +107,20 @@ else()
     message("Library IMGUI detected")
 endif()
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui")
-
+file(GLOB IMGUI_SRC
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/opengl3_example/*.cpp"
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/opengl3_example/*.h"
+)
+add_library( imgui STATIC ${IMGUI_SRC} )
+target_include_directories(imgui PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/libs/gl3w" 
+	"${CMAKE_CURRENT_SOURCE_DIR}/lib/imgui/examples/libs/glfw/include"	 
+)
+set_property(TARGET imgui PROPERTY FOLDER IMGUI)
+target_link_libraries( imgui glew )
+target_link_libraries( engine imgui )
 
 #STB
 if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/stb")
