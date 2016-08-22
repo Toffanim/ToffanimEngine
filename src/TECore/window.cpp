@@ -32,7 +32,7 @@ namespace TE
 			glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 #endif
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
 			_WindowHandle = glfwCreateWindow(Width, Height, Title.c_str(), NULL, NULL);
 			if (!_WindowHandle)

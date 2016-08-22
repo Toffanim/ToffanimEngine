@@ -36,6 +36,7 @@ namespace TE
 			return (SMM);
 		}
 		std::map<void*, simple_file_locator > MemoryMap;
+		size_t MemoryUsed = 0;
 
 		void* Alloc(size_t Size, const char* File, int Line, bool IsArray)
 		{
@@ -47,10 +48,15 @@ namespace TE
 			void* Ptr = malloc(Size);
 			if (Ptr)
 			{
+<<<<<<< HEAD
 #if _CHECK_HEAP_CORRUPTION
 				memset((char*)Ptr + Size - _CHECK_HEAP_LENGTH, _CHECK_HEAP_CHAR, _CHECK_HEAP_LENGTH);
 #endif
 				simple_file_locator SFL{ Size - _CHECK_HEAP_LENGTH, File, Line, IsArray };
+=======
+				simple_file_locator SFL{ Size, File, Line, IsArray };
+				MemoryUsed += Size;
+>>>>>>> origin/master
 				MemoryMap[Ptr] = SFL;
 				return (Ptr);
 			}
@@ -81,8 +87,14 @@ namespace TE
 						if (IsArray)
 						    std::cerr << "Using delete[] on new" << std::endl;
 						else
+<<<<<<< HEAD
 					        std::cerr << "Using delete on new[]" << std::endl;
 					MemoryMap.erase(It);
+=======
+					        std::cerr << "Using delete on new[]" << endl;
+					MemoryUsed -= It->second.Size;
+					MemoryMap.erase(It);					
+>>>>>>> origin/master
 				}
 			}
 			free(Ptr);
