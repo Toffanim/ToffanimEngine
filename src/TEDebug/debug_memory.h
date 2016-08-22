@@ -14,6 +14,9 @@ $Notice: $
 #include <stdexcept>
 
 #define _REDEFINED_NEW 1
+#define _CHECK_HEAP_CORRUPTION 1
+#define _CHECK_HEAP_CHAR 'A'
+#define _CHECK_HEAP_LENGTH 10
 
 namespace TE
 {
@@ -38,10 +41,16 @@ namespace TE
 		{
 			if (Size <= 0)
 				throw std::runtime_error("Trying to malloc zero sized object");
+#if _CHECK_HEAP_CORRUPTION
+			Size += _CHECK_HEAP_LENGTH;
+#endif
 			void* Ptr = malloc(Size);
 			if (Ptr)
 			{
-				simple_file_locator SFL{ Size, File, Line, IsArray };
+#if _CHECK_HEAP_CORRUPTION
+				memset((char*)Ptr + Size - _CHECK_HEAP_LENGTH, _CHECK_HEAP_CHAR, _CHECK_HEAP_LENGTH);
+#endif
+				simple_file_locator SFL{ Size - _CHECK_HEAP_LENGTH, File, Line, IsArray };
 				MemoryMap[Ptr] = SFL;
 				return (Ptr);
 			}
@@ -70,14 +79,43 @@ namespace TE
 					*/}
 					else
 						if (IsArray)
-						    std::cerr << "Using delete[] on new" << endl;
+						    std::cerr << "Using delete[] on new" << std::endl;
 						else
-					        std::cerr << "Using delete on new[]" << endl;
+					        std::cerr << "Using delete on new[]" << std::endl;
 					MemoryMap.erase(It);
 				}
 			}
 			free(Ptr);
 		}
+
+
+#if _CHECK_HEAP_CORRUPTION
+
+		void CheckHeapCorruption()
+		{
+			const char* Buffer[_CHECK_HEAP_LENGTH];
+			memset(Buffer, _CHECK_HEAP_CHAR, _CHECK_HEAP_LENGTH);
+			if (!MemoryMap.empty())
+			{
+				for (auto& Item : MemoryMap)
+				{
+					if (memcmp(Buffer, (char*)(Item.first) + Item.second.Size, _CHECK_HEAP_LENGTH))
+					{
+						std::cerr << "Written past object size in object declared in file "
+							<< Item.second.File
+							<< " line "
+							<< Item.second.Line << std::endl;
+					}
+				}
+			}
+		}
+#else
+		void CheckHeapCorruption()
+		{
+
+		}
+#endif
+
 
 		~simple_memory_manager()
 		{
@@ -102,13 +140,13 @@ namespace TE
 						<< " at ptr : "
 						<< Item.first
 						<< std::endl;
-					TotalBytesLeaked += Item.second.Size;
 
+					TotalBytesLeaked += Item.second.Size;
 				}
 
 				std::cerr << "Memory leaked for a total of "
 					<< TotalBytesLeaked
-					<< "bytes" << std::endl;
+					<< " bytes" << std::endl;
 			}
 			else
 			{
@@ -126,21 +164,22 @@ namespace TE
 	};
 }
 
+inline 
+void* operator new(size_t Size, const char* File, int Line)
+{
+	return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, false));
+}
 
-	inline void* operator new(size_t Size, const char* File, int Line)
-	{
-		return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, false));
-	}
-
-	inline void* operator new[](size_t Size, const char* File, int Line)
-	{
-		return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, true));
-	}
+inline 
+void* operator new[](size_t Size, const char* File, int Line)
+{
+	return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, true));
+}
 
 
 
-	//Macros to hook new and delete keywords
-	#define DEBUG_NEW new(__FILE__, __LINE__)
+//Macros to hook new and delete keywords
+#define DEBUG_NEW new(__FILE__, __LINE__)
 #if _REDEFINED_NEW
 	#define new DEBUG_NEW	
 	void operator delete(void* Ptr)

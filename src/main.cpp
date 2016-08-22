@@ -32,7 +32,6 @@ void CloseApp()
 //Launch game
 int main(int argc, char** argv)
 {
-
 #if 1
 	// TE_Init() : Init every global variables, creating a window, some fbos and shaders
 	//
