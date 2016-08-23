@@ -12,9 +12,11 @@
 #include "GL/glew.h"
 #include "glm/glm.hpp"
 #include "glm/gtc/type_ptr.hpp"
-#include "TERenderer\shader.h"
-#include "stb_image.h"
+
 #include <iostream>
+
+#include "TERenderer\shader.h"
+#include "TECore\utils.h"
 
 class Skybox
 {

@@ -34,7 +34,11 @@ void RecordEndEvent(const char* GUID)
 	for (auto& DebugEvent : GlobalDebugEventList)
 	{
 		if (GUID == DebugEvent.GUID)
-			DebugEvent.CyclesCount = __rdtsc() - DebugEvent.CyclesBegin;
+		{
+			auto Cycles = __rdtsc();
+			auto Diff = Cycles - DebugEvent.CyclesBegin;
+			DebugEvent.CyclesCount = Diff;
+		}
 	}
 }
 
@@ -48,24 +52,27 @@ void RecordEndEvent(const char* GUID)
 #define TIMED_BLOCK(Name, ...) TIMED_BLOCK_(DEBUG_NAME(Name), __COUNTER__, ## __VA_ARGS__)
 #define TIMED_FUNCTION(...) TIMED_BLOCK_(DEBUG_NAME(__FUNCTION__), ## __VA_ARGS__)
 
-
 #define BEGIN_BLOCK_(GUID) { RecordBeginEvent(GUID);/* Record event begin block */ }
 #define END_BLOCK_(GUID) { RecordEndEvent(GUID);/* Record event end block */  }
+
+#define BEGIN_FRAME() { GlobalDebugEventList.clear(); }
 
 #define BEGIN_BLOCK(Name) BEGIN_BLOCK_(DEBUG_NAME(Name))
 #define END_BLOCK() END_BLOCK_(DEBUG_NAME("END_BLOCK_"))
 
 struct timed_block
 {
+	const char* _GUID;
 	timed_block(char *GUID, unsigned int HitCountInit = 1)
 	{
-		BEGIN_BLOCK_(GUID);
+		_GUID = GUID;
+		BEGIN_BLOCK_(_GUID);
 		// TODO(casey): Record the hit count value here?
 	}
 
 	~timed_block()
 	{
-		END_BLOCK();
+		END_BLOCK_(_GUID);
 	}
 };
 

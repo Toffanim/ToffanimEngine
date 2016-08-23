@@ -11,16 +11,30 @@ $Notice: $
 
 #include <stdlib.h>
 #include <string>
+#include <memory>
+
 #include "GL/glew.h"
+#include "stb_image.h"
+#include "TEDebug\debug_memory.h"
 
 #define NON_COPYABLE_CLASS(Class) \
 Class(const Class&) = delete;\
 Class& operator=(const Class&) = delete;
 
+
+#define Kilobytes(Value) ((Value)*1024LL)
+#define Megabytes(Value) (Kilobytes(Value)*1024LL)
+#define Gigabytes(Value) (Megabytes(Value)*1024LL)
+#define Terabytes(Value) (Gigabytes(Value)*1024LL)
+
 namespace TE
 {
 	namespace Core
 	{
+
+		std::unique_ptr<unsigned char> LoadImage(const char* Path, int* Width, int* Height, int* Comp, unsigned int Channels);
+
+
 		//Is there on or more error since last call ?
 		static bool CheckOpenGLError(const char* Title)
 		{

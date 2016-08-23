@@ -96,14 +96,13 @@ GLuint Skybox::loadCubemap(const vector<const GLchar*>& faces)
     glGenTextures(1, &textureID);
 
     int x,y,comp;
-    unsigned char* image;
+    std::unique_ptr<unsigned char> image;
     
     glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
     for(GLuint i = 0; i < faces.size(); i++)
     {
-        image = stbi_load(faces[i], &x, &y, &comp, STBI_rgb);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB8, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
-        stbi_image_free(image);
+        image = TE::Core::LoadImage(faces[i], &x, &y, &comp, STBI_rgb);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB8, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, image.get());
     }
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);

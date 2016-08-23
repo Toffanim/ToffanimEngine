@@ -12,8 +12,10 @@ $Notice: $
 #include <stdlib.h>
 #include <iostream>
 #include <stdexcept>
+#include <map>
 
 #define _REDEFINED_NEW 1
+#define _HOOK_MALLOC 1
 #define _CHECK_HEAP_CORRUPTION 1
 #define _CHECK_HEAP_CHAR 'A'
 #define _CHECK_HEAP_LENGTH 10
@@ -198,15 +200,26 @@ void operator delete[](void* Ptr, const char* File, int Line)
 #define DEBUG_NEW new(__FILE__, __LINE__)
 #if _REDEFINED_NEW
 	#define new DEBUG_NEW	
+    inline
 	void operator delete(void* Ptr)
 	{
 		TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, false);
 	}
 
+    inline
 	void operator delete[](void* Ptr)
 	{
 		TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, true);
 	}
 #endif
+
+# ifdef _HOOK_MALLOC
+#   ifdef new
+#     define malloc(s) ((void*)(new char[s]))
+#   else
+#     define malloc(s) ((void*)(DEBUG_NEW char[s]))
+#   endif
+#   define free(p) delete[] (char*)(p)
+# endif
 
 #endif

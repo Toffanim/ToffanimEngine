@@ -14,8 +14,8 @@ $Notice: $
 #include <GL/glew.h>
 #include <memory>
 
-#include "stb_image.h"
 #include "utils.h"
+
 
 namespace TE
 {

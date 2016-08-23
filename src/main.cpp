@@ -30,6 +30,7 @@ void CloseApp()
 	Continue = false;
 }
 
+// IMPORTANT (MArc) : MAKE THIS HIDDEN TO THE USER
 void BindImGuiCallbacks()
 {
 	glfwSetMouseButtonCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_MouseButtonCallback);
@@ -52,6 +53,109 @@ void ToggleDebugMode()
 		TE::Window->HideCursor();
 		TE::Window->BindInputHandler();
 	}
+}
+
+void TestFunction()
+{
+	TIMED_FUNCTION();
+	for (int i = 0; i < 10; ++i)
+		continue;
+}
+
+void Update()
+{
+
+}
+
+void RenderFrame(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Skybox* skybox)
+{
+	TIMED_FUNCTION();
+
+	//Matrices
+	mat4f MV = Projection * View;
+	mat4f MVP = MV;
+
+	glViewport(0, 0, TE::Window->GetWidth(), TE::Window->GetHeight());
+	TE::GBufferFBO->Bind();
+	glClearColor(0.f, 1.f, 0.0f, 1.f);
+	TE::GBufferFBO->Clear();
+
+	// Render Atmosphere
+	mat4f ViewNoTrans = mat4f(mat3f(View));    // Remove any translation component of the view matrix
+	skybox->display(ViewNoTrans, Projection);
+	TE::GBufferFBO->Clear(Core::frame_buffer::CLEAR_DEPTH);
+	//Render scene geometry
+	for (auto Actor : Scene)
+		Actor->Render(Projection, View);
+
+	//Clean default FBOs
+	Core::frame_buffer::BindDefaultFBO();
+	glClearColor(0.f, 1.f, 1.f, 1.f);
+	Core::frame_buffer::ClearDefaultFBO();
+	// Blit from GBuffer to default FBO
+	BlitShader.Bind();
+	BlitShader.SetInt("Texture", 0);
+	glActiveTexture(GL_TEXTURE0);
+	TE::GBufferFBO->BindTexture("Colors");
+	//TE::GBufferFBO->BindTexture("Normals");
+	//TE::GBufferFBO->BindDepthTexture();
+	UnitQuad.Render();
+}
+
+void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Skybox* skybox)
+{
+	RenderFrame(Scene, View, Projection, BlitShader, UnitQuad, skybox);
+
+	// TODO (Marc) : Make this a debug_ui object
+	if (DebugMode)
+	{
+		ImGui_ImplGlfwGL3_NewFrame();
+		ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
+		ImGui::Text("FPS : %.1f (%.3f ms/frame)", ImGui::GetIO().Framerate, 1000.0f / ImGui::GetIO().Framerate);
+		auto k = simple_memory_manager::instance().MemoryUsed;
+		auto test = simple_memory_manager::instance().MemoryUsed / (double)Megabytes(1);
+
+		// NOTE ( Marc) : should test this on AMD cards
+		//if (GLEW_ATI_meminfo)
+		//	glGetIntegerv(GL_TEXTURE_FREE_MEMORY_ATI, availableKB);
+
+		GLint total_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX,
+			&total_mem_kb);
+
+		GLint cur_avail_mem_kb = 0;
+		glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX,
+			&cur_avail_mem_kb);
+		auto VRAMUsed = total_mem_kb - cur_avail_mem_kb;
+		ImGui::Text("PROGRAM RAM : %.2f MB", simple_memory_manager::instance().MemoryUsed / (double)Megabytes(1));
+		ImGui::Text("SYSTEM VRAM : %d / %d (%.2f %% used)", VRAMUsed / Kilobytes(1), total_mem_kb / Kilobytes(1), (VRAMUsed / (double)total_mem_kb)*100.f);
+
+		std::sort(GlobalDebugEventList.begin(), GlobalDebugEventList.end(), [](const debug_event& a, const debug_event& b) { return (a.CyclesCount > b.CyclesCount); });
+		for (auto Event : GlobalDebugEventList)
+		{
+			ImGui::Text("%s : %llu cycles", Event.GUID, Event.CyclesCount);
+		}
+
+		if (ImGui::IsMouseHoveringAnyWindow())
+		{
+			BindImGuiCallbacks();
+		}
+		else
+		{
+			TE::Window->BindInputHandler();
+		}
+
+		ImGui::Render();
+	}
+	else
+	{
+		ImGui_ImplGlfwGL3_NewFrame();
+		ImGui::Render();
+	}
+
+
+	TE::Window->SwapBuffers();
+	Core::CheckOpenGLError("end frame");
 }
 
 //Launch game
@@ -211,64 +315,15 @@ int main(int argc, char** argv)
 	//Main loop
 	while (Continue)
 	{
+		BEGIN_FRAME();
+		TestFunction();
+#if 1
+		Update();
 		//Matrices
 		mat4f View = FreeCam.GetView();
 		mat4f Projection = FreeCam.GetProjection();
-		mat4f MV = Projection * View;
-		mat4f MVP = MV;		
-
-		glViewport(0, 0, TE::Window->GetWidth(), TE::Window->GetHeight());
-		TE::GBufferFBO->Bind();
-		glClearColor(0.f, 1.f, 0.0f, 1.f);
-		TE::GBufferFBO->Clear();
-
-		// Render Atmosphere
-		mat4f ViewNoTrans = glm::mat4(glm::mat3(FreeCam.GetView()));    // Remove any translation component of the view matrix
-		skybox->display(ViewNoTrans, Projection);
-		TE::GBufferFBO->Clear(Core::frame_buffer::CLEAR_DEPTH);
-		//Render scene geometry
-		Sprite->Render( Projection, View );
-		SpriteBackground->Render(Projection, View);
-
-		//Clean default FBOs
-		Core::frame_buffer::BindDefaultFBO();
-		glClearColor(0.f, 1.f, 1.f, 1.f);
-		Core::frame_buffer::ClearDefaultFBO();
-		// Blit from GBuffer to default FBO
-		BlitShader.Bind();
-		BlitShader.SetInt("Texture", 0);
-		glActiveTexture(GL_TEXTURE0);
-		TE::GBufferFBO->BindTexture("Colors");
-		//TE::GBufferFBO->BindTexture("Normals");
-		//TE::GBufferFBO->BindDepthTexture();
-		UnitQuad.Render();
-
-		if (DebugMode)
-		{
-			ImGui_ImplGlfwGL3_NewFrame();
-			ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_FirstUseEver);
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-
-			if (ImGui::IsMouseHoveringAnyWindow())
-			{
-				BindImGuiCallbacks();
-			}
-			else
-			{
-				TE::Window->BindInputHandler();
-			}
-
-			ImGui::Render();
-		}
-		else
-		{
-			ImGui_ImplGlfwGL3_NewFrame();
-			ImGui::Render();
-		}
-		
-
-		TE::Window->SwapBuffers();
-		Core::CheckOpenGLError("end frame");
+		Render(SceneActors, View, Projection, BlitShader, UnitQuad, skybox);
+#endif
 	}
 
 	delete skybox;

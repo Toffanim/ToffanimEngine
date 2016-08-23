@@ -17,6 +17,7 @@ namespace TE
 
 		sprite::~sprite()
 		{
+			delete _Quad;
 		}
 
 		void sprite::SetSize(Math::vec2f NewSize)

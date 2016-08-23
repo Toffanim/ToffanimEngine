@@ -27,7 +27,6 @@ $Notice: $
 #include "frame_buffer.h"
 #include "TERenderer\shader.h"
 #include "globals.h"
-#include "TEDebug\debug.h"
 
 namespace TE
 {

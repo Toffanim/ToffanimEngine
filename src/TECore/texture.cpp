@@ -1,4 +1,3 @@
-#define STB_IMAGE_IMPLEMENTATION
 #include "texture.h"
 
 namespace TE
@@ -18,7 +17,7 @@ namespace TE
 			_RawData(nullptr)
 		{
 			int comp;
-			_RawData = std::unique_ptr<unsigned char>(stbi_load(_Path.c_str(), &_Width, &_Height, &comp, 3));
+			_RawData = LoadImage(_Path.c_str(), &_Width, &_Height, &comp, 3);
 			if (_RawData)
 			{
 				glGenTextures(1, &_ID);
