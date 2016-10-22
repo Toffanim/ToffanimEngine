@@ -12,7 +12,6 @@ using namespace std;
 #include "engine.h"
 using namespace TE;// <= Using namesapce TE to save time
 
-#include "Skybox.h"
 //TODO(Marc)
 
 // ------ Multiple window with multiple contexts ------
@@ -67,7 +66,7 @@ void Update()
 
 }
 
-void RenderFrame(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Skybox* skybox)
+void RenderFrame(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Renderer::skybox* skybox)
 {
 	TIMED_FUNCTION();
 
@@ -102,7 +101,7 @@ void RenderFrame(const Physic::bvh_object_list& Scene, const mat4f& View, const 
 	UnitQuad.Render();
 }
 
-void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Skybox* skybox)
+void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Renderer::skybox* skybox)
 {
 	RenderFrame(Scene, View, Projection, BlitShader, UnitQuad, skybox);
 
@@ -236,7 +235,7 @@ int main(int argc, char** argv)
 	faces.push_back("../assets/skyboxes/Test/yneg.png");
 	faces.push_back("../assets/skyboxes/Test/zpos.png");
 	faces.push_back("../assets/skyboxes/Test/zneg.png");
-	Skybox* skybox = new Skybox(faces);
+	Renderer::skybox* Skybox = new Renderer::skybox(faces);
 
 
 	Renderer::camera_actor FreeCam({ 0, -2, 0 });
@@ -322,11 +321,11 @@ int main(int argc, char** argv)
 		//Matrices
 		mat4f View = FreeCam.GetView();
 		mat4f Projection = FreeCam.GetProjection();
-		Render(SceneActors, View, Projection, BlitShader, UnitQuad, skybox);
+		Render(SceneActors, View, Projection, BlitShader, UnitQuad, Skybox);
 #endif
 	}
 
-	delete skybox;
+	delete Skybox;
 #endif
 	TE_Clean();
     return(0);

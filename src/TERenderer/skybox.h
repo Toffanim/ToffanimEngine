@@ -9,26 +9,33 @@
 
 #define SKYBOX_H
 #include <vector>
+#include "TECore\math.h"
 #include "GL/glew.h"
-#include "glm/glm.hpp"
-#include "glm/gtc/type_ptr.hpp"
 
 #include <iostream>
 
 #include "TERenderer\shader.h"
 #include "TECore\utils.h"
+#include "TECore\vertex_array.h"
 
-class Skybox
+namespace TE
 {
-public :
-    Skybox( const std::vector< const GLchar*>& faces );
-    ~Skybox();
-	void display(glm::mat4 view, glm::mat4 proj);
-	GLuint texture_id;
-private :
-    GLuint loadCubemap( const std::vector<const GLchar*>& faces );
-    GLuint VAO;
-    GLuint VBO;
-    TE::Renderer::shader* Shader;
-};
+	namespace Renderer
+	{
+		class skybox
+		{
+		public:
+			skybox(const std::vector< const GLchar*>& Faces);
+			~skybox();
+			void display(Math::mat4f View, Math::mat4f Proj);
+		private:
+			GLuint loadCubemap(const std::vector<const GLchar*>& faces);
+			Core::vertex_array* _VAO;
+			GLuint _VBO;
+			GLuint _TextureID;
+			shader* _Shader;
+		};
+	}
+}
+
 #endif

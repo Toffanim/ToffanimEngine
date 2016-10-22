@@ -12,6 +12,8 @@ $Notice: $
 #include <stdlib.h>
 #include <vector>
 
+//Partially inspired by HandmadeHero's code
+
 struct debug_event
 {
 	const char* GUID;
@@ -67,7 +69,6 @@ struct timed_block
 	{
 		_GUID = GUID;
 		BEGIN_BLOCK_(_GUID);
-		// TODO(casey): Record the hit count value here?
 	}
 
 	~timed_block()

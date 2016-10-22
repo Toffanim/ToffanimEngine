@@ -13,5 +13,6 @@ $Notice: $
 #include "camera_actor.h"
 #include "sprite.h"
 #include "camera_component.h"
+#include "skybox.h"
 
 #endif

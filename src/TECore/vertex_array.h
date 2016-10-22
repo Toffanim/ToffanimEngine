@@ -23,6 +23,7 @@ namespace TE
 		{
 		public:
 			vertex_array( std::vector<Core::vertex> Vertices, std::vector<unsigned int> Indices);
+			vertex_array(std::vector<Core::vertex> Vertices);
 			~vertex_array();
 
 			void Bind() const;
@@ -34,6 +35,7 @@ namespace TE
 			Core::vertex_buffer _VertexBuffer;
 			GLuint _EBO;
 			size_t _IndicesCount;
+			size_t _VerticesCount;
 		};
 	}
 }

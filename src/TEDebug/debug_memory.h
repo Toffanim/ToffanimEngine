@@ -164,8 +164,6 @@ namespace TE
 					<< std::endl;
 			}
 			MemoryMap.clear();
-
-			std::cerr << "Breakpoint" << std::endl;
 		}
 	};
 }
