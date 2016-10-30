@@ -1,0 +1,70 @@
+set nocompatible
+set ruler
+set smartindent
+set autoindent
+set splitbelow
+set splitright
+
+set verbose=0
+
+syntax on
+
+if has('gui_running')
+  colorscheme slate
+  set guioptions-=T " no toolbar
+  set guioptions-=m " no menu
+  set guioptions-=l " no left scroll bar
+  set guioptions-=L " no left scroll bar when split
+  set guioptions-=r " no right scroll bar
+  set guioptions-=R " no right scroll bar when split
+  set lines=999 columns=999 linespace=0
+  if has('gui_win32')
+    set guifont=DejaVu_Sans_Mono:h10:cANSI
+  else
+    set guifont=DejaVu\ Sans\ Mono\ 10
+  endif
+endif
+
+imap <Tab> <C-P>  " autocomplete with tab
+
+let Author = "TOFFANIN Marc"
+
+function! s:insert_gates_header()
+  let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
+  execute "normal! i/* ======================================================================== "
+  execute "normal! o$File: " .expand("%") ." $ "
+  execute "normal! o$Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o$Revision: $ "
+  execute "normal! o$Creator : TOFFANIN Marc $"
+  execute "normal! o$Notice: Licensed under GNU GPL $"
+  execute "normal! o======================================================================== */ "
+  execute "normal! o#ifndef " . gatename
+  execute "normal! o#define " . gatename . " "
+  execute "normal! Go#endif /* " . gatename . " */"
+  normal! kk
+endfunction
+autocmd BufNewFile *.{h,hpp} call <SID>insert_gates_header()
+
+
+function! s:insert_gates_unit()
+  let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
+  let filename = substitute(expand("%:t"), "\\.", "", "g")
+  execute "normal! i/* ======================================================================== "
+  execute "normal! o$File: " .expand("%") ." $ "
+  execute "normal! o$Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o$Revision: $ "
+  execute "normal! o$Creator : TOFFANIN Marc $"
+  execute "normal! o$Notice: Licensed under GNU GPL $"
+  execute "normal! o======================================================================== */ "
+  execute "normal! o#include \"" . filename .".h\""
+  normal! kk
+endfunction
+autocmd BufNewFile *.{c,cpp} call <SID>insert_gates_unit()
+autocmd BufWritePre,FileWritePre *.{h,hpp,c,cpp} execute "normal! 4GddO$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $"
+
+autocmd VimEnter * vsp  " Split window verticaly at startup
+autocmd VimResized * wincmd =  " equalized split width when resizing window
+autocmd InsertEnter,InsertLeave * set cul! " Change cursor when changing mode
+
