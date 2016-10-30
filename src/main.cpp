@@ -312,7 +312,7 @@ int main(int argc, char** argv)
 	WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_3, TE::Core::PRESS), &ToggleDebugMode);
 
 	//Main loop
-	while (Continue)
+	while (Continue && Window->Running())
 	{
 		BEGIN_FRAME();
 		TestFunction();

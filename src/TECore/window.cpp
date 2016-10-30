@@ -46,8 +46,13 @@ namespace TE
 			glfwSetWindowUserPointer(_WindowHandle, this);
 
 			glfwSetWindowSizeCallback(_WindowHandle, &window::ResizeCallback);
+			glfwSetWindowCloseCallback(_WindowHandle, &window::CloseCallback);
 
 			BindInputHandler();
+
+			_IsRunning = true;
+			_IsFullscreen = false;
+			_IsResizable = true;
 		}
 
 		window::~window()

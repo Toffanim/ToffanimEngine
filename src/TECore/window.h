@@ -50,6 +50,22 @@ namespace TE
 				_Window->SetHeight( height );
 			}
 
+			static void CloseCallback(GLFWwindow* Window)
+			{
+				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(Window));
+				_Window->Close();
+			}
+
+			void Close()
+			{
+				_IsRunning = false;
+			}
+
+			bool Running()
+			{
+				return(_IsRunning);
+			}
+
 			bool IsResizable() const 
 			{ 
 				return (_IsResizable); 
@@ -113,6 +129,7 @@ namespace TE
 			bool _IsResizable;
 			bool _IsVerticalSyncOn;
 			bool _IsFullscreen;
+			bool _IsRunning;
 			GLFWwindow* _WindowHandle;
 		};
 	}
