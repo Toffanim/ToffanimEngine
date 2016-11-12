@@ -1,5 +1,8 @@
 # TOFFANIM ENGINE
 
+Objectives : Simple demonstration of modern real-time realistic rendering techniques. I don't really care about FPS or loading heavily complex scenes (as long as I can demonstrate at 15FPS+).
+This is not a good coding examples data base or whatnot. If the idea of using this software crossed your mind at some point (I sincerely hope that you don't), DON'T USE THIS SOFTWARE FOR PRODUCTIONS
+
 #HOW TO BUILD
 (Tested only on windows for now)
 - mkdir build && cd build/
@@ -15,22 +18,28 @@ git submodule update --init -- lib/imgui
 git submodule update --init -- lib/stb
 
 TODO :
-- add opti deferred (compressed normals + AABB light volume rasterizing )
-- improve shadows (soft shadow (PCSS) and CSM )
-- clean texture/fbo creation
-- clean light creation/display
-- add SSAA and SSReflection
-- PostFX : lens flare
-- clean particle code to do clean particle generation and rendering
-- terrain tesselation
+- Add Models loading and rendering
+- Add Materials pipeline (PBR + IBL (only with skybox reflection at first, see S.Lagarde cubemaps for real Environnement probes))
+- Add Lights creation/display
+- Add Shadows ( CSM for DirectionalLight // PCSS + FTS later ? )
+- Optimize Deferred Rendering (compressed normals + light frustrum volume rasterizing )
+- Add SSAA (FXAA, maybe TAA ?) // SSAO ( Test to implements VXAO ? Seems really interesting ) // SSR
+- PostFX : lens flare, chromatic aberration, eye adaptation, vigneting,HDR, Bloom, Blur, Light shaft (maybe not in PostFX => polygonal volumetric light scattering ?)
+- create simple Particles pipeline
+- Add clean terrain tesselation
+- Physically Based Atmospheric / Sky rendering
+- Physically Based shading and physics of hair
+- Clothes ?
+- Optimize Driver Overhead ( Texture array / Texture atlas, MultiDrawIndirectArrays and CommandBuffers (OpenGL 4.5) )
+
+- Editor specific things : Reflection / Code Generation / Events / Components / Modules (lumberyard talk @GDC2016)
+
+- Get rid of all librairies ? Really if I have time, those library are good enough for demonstration purposes
+- Start tinkering with Vulkan ? should be really hard and long in the beginning (AKA Memory management, using descriptors, etc) but not so hard to convert from OpenGL 4.5
 
 DONE :
-- sun added
-- add shadow for directional/point/spot light
-- PostFX : HDR, Bloom, Blur, Light shaft
 
-
-BUGFIX :
-
-- when we use imgui, cursor only work inside window (deactivated for now)
+- Add texture 2D creation
+- Add FBO / VBO creation
+- Add Skybox
 
