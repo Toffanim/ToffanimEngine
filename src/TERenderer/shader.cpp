@@ -1,10 +1,11 @@
 /* ========================================================================
-   $File: $
-   $Date: $
-   $Revision: $
-   $Creator: Casey Muratori $
-   $Notice: (C) Copyright 2015 by Molly Rocket, Inc. All Rights Reserved. $
-   ======================================================================== */
+    $File: TERenderer\shader.cpp $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
+  ======================================================================== */
 #include "Shader.h"
 using namespace std;
 

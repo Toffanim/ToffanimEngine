@@ -1,12 +1,12 @@
-#if !defined(INPUTS_H)
 /* ========================================================================
-$File: $
-$Date: $
-$Revision: $
-$Creator:  $
-$Notice: $
-======================================================================== */
-
+    $File: TECore\inputs.h $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
+   ======================================================================== */
+#if !defined(INPUTS_H)
 #define INPUTS_H
 
 #include "GLFW/glfw3.h"

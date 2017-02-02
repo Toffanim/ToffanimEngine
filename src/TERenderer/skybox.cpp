@@ -1,9 +1,10 @@
 /* ========================================================================
-   $File: $
-   $Date: $
-   $Revision: $
-   $Creator: Marc TOFFANIN $
-   $Notice: Given as-is without warranty AT ALL that it's working$
+    $File: TERenderer\skybox.cpp $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
    ======================================================================== */
 #include "Skybox.h"
 using namespace std;

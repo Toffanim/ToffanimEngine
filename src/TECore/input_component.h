@@ -1,12 +1,12 @@
-#if !defined(INPUT_COMPONENT_H)
 /* ========================================================================
-$File: $
-$Date: $
-$Revision: $
-$Creator:  $
-$Notice: $
-======================================================================== */
-
+    $File: TECore\input_component.h $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
+   ======================================================================== */
+#if !defined(INPUT_COMPONENT_H)
 #define INPUT_COMPONENT_H
 #include "component.h"
 #include <stdlib.h>

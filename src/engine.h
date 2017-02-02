@@ -1,10 +1,11 @@
 /* ========================================================================
-$File: $
-$Modified: 30-10-2016 02h18m01s $ $Date: $
-$Modified: 30-10-2016 02h19m46s $ $Revision: $
-$Creator:  $
-$Notice: $
-======================================================================== */
+    $File: engine.h $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
+   ======================================================================== */
 #if !defined(ENGINE_H)
 #define ENGINE_H
 #include "TECore\core.h"

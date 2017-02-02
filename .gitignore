@@ -4,6 +4,7 @@
 
 build/
 SavePremake/
+OpenProject.bat
 
 #################
 ## Eclipse

@@ -1,14 +1,15 @@
+/* ======================================================================== 
+$File: TECore\core.h $ 
+$Created: 21-11-2016 16h29m54s $ 
+$Modified: 21-11-2016 17h40m12s $
+$Revision: $ 
+$Creator : TOFFANIN Marc $
+$Notice: Licensed under GNU GPL $
+======================================================================== */ 
 #if !defined(CORE_H)
-/* ========================================================================
-$File: $
-$Date: $
-$Revision: $
-$Creator:  $
-$Notice: $
-======================================================================== */
-
 #define CORE_H
 
+#include "types.h"
 #include "math.h"
 #include "window.h"
 #include "texture.h"

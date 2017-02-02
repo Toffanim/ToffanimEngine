@@ -4,6 +4,13 @@ set smartindent
 set autoindent
 set splitbelow
 set splitright
+set autowriteall
+set number
+set wildmode=longest:list,full
+set wildmenu
+set backspace=indent,eol,start
+set showmode
+set shellslash
 
 set verbose=0
 
@@ -19,27 +26,40 @@ if has('gui_running')
   set guioptions-=R " no right scroll bar when split
   set lines=999 columns=999 linespace=0
   if has('gui_win32')
-    set guifont=DejaVu_Sans_Mono:h10:cANSI
+    set guifont=DejaVu_Sans_Mono:h12:cANSI
   else
-    set guifont=DejaVu\ Sans\ Mono\ 10
+    set guifont=DejaVu\ Sans\ Mono\ 12
   endif
 endif
 
-imap <Tab> <C-P>  " autocomplete with tab
+func Backspace()
+  if col('.') == 1
+    if line('.')  != 1
+      return  "\<ESC>kA\<Del>"
+    else
+      return ""
+    endif
+  else
+    return "\<Left>\<Del>"
+  endif
+endfunc
+inoremap <BS> <c-r>=Backspace()<CR>
+
+imap <Tab> <C-P>
 
 let Author = "TOFFANIN Marc"
 
 function! s:insert_gates_header()
   let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
   execute "normal! i/* ======================================================================== "
-  execute "normal! o$File: " .expand("%") ." $ "
-  execute "normal! o$Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
-  execute "normal! o$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
-  execute "normal! o$Revision: $ "
-  execute "normal! o$Creator : TOFFANIN Marc $"
-  execute "normal! o$Notice: Licensed under GNU GPL $"
-  execute "normal! o======================================================================== */ "
-  execute "normal! o#ifndef " . gatename
+  execute "normal! o    $File: " .expand("%") ." $ "
+  execute "normal! o    $Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o    $Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o    $Revision: $ "
+  execute "normal! o    $Creator : TOFFANIN Marc $"
+  execute "normal! o    $Notice: Licensed under GNU GPL $"
+  execute "normal! o   ======================================================================== */ "
+  execute "normal! o#if !defined( " . gatename . " )"
   execute "normal! o#define " . gatename . " "
   execute "normal! Go#endif /* " . gatename . " */"
   normal! kk
@@ -51,13 +71,13 @@ function! s:insert_gates_unit()
   let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
   let filename = substitute(expand("%:t"), "\\.", "", "g")
   execute "normal! i/* ======================================================================== "
-  execute "normal! o$File: " .expand("%") ." $ "
-  execute "normal! o$Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
-  execute "normal! o$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
-  execute "normal! o$Revision: $ "
-  execute "normal! o$Creator : TOFFANIN Marc $"
-  execute "normal! o$Notice: Licensed under GNU GPL $"
-  execute "normal! o======================================================================== */ "
+  execute "normal! o    $File: " .expand("%") ." $ "
+  execute "normal! o    $Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o    $Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! o    $Revision: $ "
+  execute "normal! o    $Creator : TOFFANIN Marc $"
+  execute "normal! o    $Notice: Licensed under GNU GPL $"
+  execute "normal! o   ======================================================================== */ "
   execute "normal! o#include \"" . filename .".h\""
   normal! kk
 endfunction

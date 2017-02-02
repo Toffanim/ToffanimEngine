@@ -1,11 +1,12 @@
-#ifndef BVH_h
 /* ========================================================================
-$File: $
-$Date: $
-$Revision: $
-$Creator:  $
-$Notice: $
-======================================================================== */
+    $File: TEPhysics\bvh.h $
+    $Created: 01-01-2017 00h00m00s $
+    $Modified: 02-02-2017 11h57m31s $
+    $Revision: $
+    $Creator : TOFFANIN Marc $
+    $Notice: Licensed under GNU GPL $
+   ======================================================================== */
+#ifndef BVH_h
 #define BVH_h
 
 #include "TECore/actor.h"
