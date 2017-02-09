@@ -1,10 +1,13 @@
-/* ========================================================================
-    $File: TECore\actor.cpp $
-    $Created: 01-01-2017 00h00m00s $
-    $Modified: 02-02-2017 11h57m31s $
-    $Revision: $
-    $Creator : TOFFANIN Marc $
-    $Notice: Licensed under GNU GPL $
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* ======================================================================== 
+   $File: TECore\actor.cpp $
+   $Created: 01-01-2017 00h00m00s $
+   $Modified: 06-02-2017 07h50m22s $
+   $Revision: $
+   $Creator : TOFFANIN Marc $
+   $Notice: Licensed under GNU GPL $
    ======================================================================== */
 #include "actor.h"
 
@@ -13,13 +16,13 @@ namespace TE
 	namespace Core
 	{
 		actor::actor() : _Root(new default_component()),
-			_Childs(std::vector<component*>({ _Root }))
+		_Childs(std::vector<component*>({ _Root }))
 		{
 			_Root->SetupAttachement(this);
 		}
 
 		actor::actor(vec3f Position) : _Position(Position), _Root(new default_component()),
-			_Childs(std::vector<component*>({ _Root }))
+		_Childs(std::vector<component*>({ _Root }))
 		{
 			_Root->SetupAttachement(this);
 		}

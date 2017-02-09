@@ -1,10 +1,13 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 /* ======================================================================== 
-    $File: TECore\types.h $ 
-    $Created: 21-11-2016 16h29m54s $ 
-    $Modified: 02-02-2017 11h57m31s $
-    $Revision: $ 
-    $Creator : TOFFANIN Marc $
-    $Notice: Licensed under GNU GPL $
+   $File: TECore\types.h $ 
+   $Created: 21-11-2016 16h29m54s $ 
+   $Modified: 08-02-2017 12h48m12s $
+   $Revision: $ 
+   $Creator : TOFFANIN Marc $
+   $Notice: Licensed under GNU GPL $
    ======================================================================== */ 
 #ifndef TYPES_H
 #define TYPES_H 
@@ -13,11 +16,12 @@
 #include <xmmintrin.h> // SIMD (intrinsics)
 
 // Differentiate static keyword
+#define instance_shared static
 #define internal static
 #define global_variable static
 #define local_persist static
 #define compile_time_const constexpr
-#define compile_time constexpr
+#define may_compile_const constexpr
 
 // Integer
 using u8 = std::uint8_t;     // Unsigned 8 bits value

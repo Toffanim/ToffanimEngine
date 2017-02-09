@@ -1,0 +1,190 @@
+TOFFANIM ENGINE C++ CODING GUIDELINES
+
++ Line up all the braces
++ Try to indent all your variables at the same position 
+
+				component*                _Root;
+				std::vector< component* > _Childs;
+				vec3f                     _Position;
+				rotation                  _Rotation;
+				axis3                     _Axis;
+				mat4f                     _ModelTransform;
+				bounding_box              _BoundingBox;
+
+ENUMERATION
+
++ Use named enum :  enum class MyEnum { Type1, Type2 }
++ If you need another type than int, specify the enum underlying type
++ Use bitwise value for "flags" type of enum : enum class Flags { F1 = 0x0, F2 = 0x1, F3 = 0x2 }
+
+SWITCH STATEMENT
+
++ Fallthrought should be explicitly commented
+
+CLASS CONVENTIONS
+
++ Declare the public interface first, and the private interface at the end of the class
++ Make single parameter class constructor explicit
++ Rule of zeros and rule of five
++ Declare destructors noexcept
++ Declare move operations noexcept
++ Declare copy operations noexcept
++ Declare swap operations noexpect
++ If a getter/setter doesn't do anything special, then don't make one ! Declare the variable public, and start to think if a class or struct is preferred
++ If a constructor / Desctructor is overcomplicated, move it to an explicit function Initialize for instance
++ Make a function a member only if it needs access to member variables
++ In every class, every default operations should be declared, even default :
+    a default constructor: X()
+    a copy constructor: X(const X&)
+    a copy assignment: operator=(const X&)
+    a move constructor: X(X&&)
+    a move assignment: operator=(X&&)
+    a destructor: ~X()
++ If you define or =delete any default operation, then define or =delete them all
++ A base class destructor should be either public and virtual, or protected and nonvirtual
++ Use a factory function if a class cannot be fully instanciated in a constructor
++ Use in-class member initializer
++ Never call virtual function in constructor, if you need to do so, then use a factory function
++ Never call virtual function in destructor
++ Make copy assignment non-virtual, take the parameter by const&, and return by non-const&
++ Make move assignment non-virtual, take the parameter by &&, and return by non-const &
++ A move operation should move and leave its source in a valid state
++ Make move/copy operation safe for self-assignment
++ A class with any virtual function should not have a copy constructor or copy assignment operator, give a Clone function instead if needed
+
+class Base {
+	public:
+		virtual owner<Base*> clone() = 0;
+		virtual ~Base() = 0;
+
+		Base(const Base&) = delete;
+		Base& operator=(const Base&) = delete;
+};
+
+class Derived : public Base {
+	public:
+		owner<Derived*> clone() override;
+		virtual ~Derived() override;
+};
+
++ Never use multiple inheritance
+
+
+STRUCT CONVENTIONS
+
++ Make data only object as struct
++ Make alignement padding explicit : struct MyStruct { vec3f MyVec; int padding; };
++ Never use union for type punning, reading a type other than the one with which the union was initialized is undefined behavior
++ Use unions to save memory
+
+
+NAMING CONVENTIONS
+
++ A type is lowercase with underscore, like : input_component, entity, game_actor
++ A variable has it's first letter capital, like : IAmAVariableName
++ Types and names are nouns
++ Method names are verbs that describe the method's effect, or describe the return value of a method that has no effect.
++ All functions that return a bool should ask a true/false question, such as IsVisible() or ShouldClearBuffer().
++ Pointer and references are just after the type with one space after : my_ptr* MyPtr;
+
+VARIABLE/FUNCTIONS CONVENTIONS
+
++ All variables should be declared one at a time so that a comment on the meaning of the variable can be provided.
++ Methods should use void as a parameter : return_type MyMethod( void );
++ Keep the number of parameters for a function reasonably low
++ You can have arbitrarly long functions, don't apply the "keep your function short and doing one logic operation at most" convention
++ Declare small and time-critical functions inline
++ Pass "IN" parameters with size less than 4*sizeof(int) by value, the others by reference to const
++ Pass "IN-OUT" parameters by reference
++ Pass "CONSUME" parameters by && and std::move it in the body
++ Prefer default argments to overloading
++ Don't declare a variable before you use it, keep the declaration close to the first usage
+
+PORTABLE TYPES ALIASES
+
++ bool for boolean values (NEVER assume the size of bool).
++ ????? TCHAR for a character (NEVER assume the size of TCHAR). ?????
++ u8 for unsigned bytes (1 byte).
++ s8 for signed bytes (1 byte).
++ u16 for unsigned "shorts" (2 bytes).
++ s16 for signed "shorts" (2 bytes).
++ u32 for unsigned ints (4 bytes).
++ s2 for signed ints (4 bytes).
++ u64 for unsigned "quad words" (8 bytes).
++ s64 for signed "quad words" (8 bytes).
++ f32 for single precision floating point (4 bytes).
++ f64 for double precision floating point (8 bytes).
+
+STATIC / CONSTEXPR ALIASES
+
++ Static as in class member is                             : instance_shared
++ Static as in file scope is                               : internal
++ Static as in global variable is                          : global_variable
++ Static as in function scope                              : local_persist
++ Constexpr as in compile time variable                    : compile_const
++ Constexpr as in function that can take compile_const var : may_compile_const
+
+
+CONST CORRECTNESS
+
++ Declare all "read-only" variables const
++ Never use const on return value
++ Put the const keyword on the end when making a pointer itself const  :  const int * const Ptr = nullptr;
+
+MODERN CPP KEYWORDS
+
++ use override and (not-so-often) final
++ use auto when the type doesn't matter to the readability
++ use static_assert for static check
+
+DATA DRIVEN DESIGN
+
+DESIGN BY CONTRACT
+
++ Specify your pre-conditions with some assert : float divide( float a, float b) { assert( b != 0) // b cannot be null  { ... } }
++ Specify your post-conditions with some assert
+    int area(int height, int width)
+    {
+        auto res = height * width;
+	assert(res > 0);
+	return res;
+    }  
+
+OPTIMIZATION
+
++ Avoid inheritance ! Use only when readability >>>> speed
++ Cuddle your cache ! Prefer contiguous memory :
+    struct Mesh 
+    {
+         void* MemoryBlock = nullptr;
+
+	 vec2* UVs = nullptr;
+	 int UVCount = 0;
+
+	 Vertex* Vertexes = nullptr;
+	 int VertexCount = 0;
+	 
+	 int* Indices = nullptr;
+	 int IndicesCount = 0;
+
+	 Mesh::~Mesh() noexcept { delete[] MemoryBlock; }
+    };
+
+    int UVSize = UVCount * sizeof( UVs[0] );
+    int VertexSize = VertexCount * sizeof( Vertexes[0] );
+    int IndiceSize = IndicesSize * sizeof( Indices[0] );
+    Mesh->Memory = new char[ VertexSize + UVsSize + IndiceSize ];
+    Mesh-> UVs = (vec2*) Memory;
+    Mesh-> VertexCount = (vertex*) Mesh->Memory + UVsSize;
+    Mesh-> IndicesCount = (int*) Mesh->Memory + UVsSize + VertexSize;    
+
++ Avoid using exceptions ! Or at least try to catch them only when you really need them. If you don't, let your programm crash
++ Look for D-Cache miss, but also for I-Cache miss : keep performance critical code as small as possible // Avoid calling functions // If your calling function put them as close as possible in the translation unit (before or after), avoir using function that are in another translation unit !!! // use inlining but don't abuse of inlining
+
+DEBUGGING TOOLS
+
++ Memory tool : Dr Memory (https://github.com/DynamoRIO/drmemory/wiki/Downloads)
++ Graphics tool : RenderDoc (https://renderdoc.org/builds) // Nvidia NSight (https://developer.nvidia.com/nvidia-nsight-visual-studio-edition)
++ Static analyzer : PVS-Studio Free (http://www.viva64.com/en/b/0457/) (https://marketplace.visualstudio.com/items?itemName=EvgeniyRyzhkov.PVS-Studio)
++ Cmd tool on Windows : Cmder (http://cmder.net/)
+

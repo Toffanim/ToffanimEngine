@@ -1,7 +1,10 @@
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 /* ======================================================================== 
 $File: TECore\core.h $ 
 $Created: 21-11-2016 16h29m54s $ 
-$Modified: 21-11-2016 17h40m12s $
+$Modified: 06-02-2017 07h50m22s $
 $Revision: $ 
 $Creator : TOFFANIN Marc $
 $Notice: Licensed under GNU GPL $

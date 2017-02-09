@@ -1,7 +1,10 @@
-#ifndef BVH_h
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* ======================================================================== 
 #define BVH_h
 
-#include "../actor/Actor.h"
+$Modified: 06-02-2017 07h50m20s $
 #include <vector>
 #include <memory>
 #include <iterator>

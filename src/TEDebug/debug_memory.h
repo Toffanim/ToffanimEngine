@@ -1,10 +1,13 @@
-/* ========================================================================
-    $File: TEDebug\debug_memory.h $
-    $Created: 01-01-2017 00h00m00s $
-    $Modified: 02-02-2017 11h57m31s $
-    $Revision: $
-    $Creator : TOFFANIN Marc $
-    $Notice: Licensed under GNU GPL $
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* ======================================================================== 
+   $File: TEDebug\debug_memory.h $
+   $Created: 01-01-2017 00h00m00s $
+   $Modified: 06-02-2017 09h39m24s $
+   $Revision: $
+   $Creator : TOFFANIN Marc $
+   $Notice: Licensed under GNU GPL $
    ======================================================================== */
 #if !defined(DEBUG_MEMORY_H)
 #define DEBUG_MEMORY_H
@@ -78,15 +81,15 @@ namespace TE
 					if (It->second.IsArray == IsArray)
 					{
 						/*std::cerr << "Delete file "
-							<< It->second.File
-							<< " line "
-							<< It->second.Line << std::endl;
-					*/}
+						  << It->second.File
+						  << " line "
+						  << It->second.Line << std::endl;
+						 */}
 					else
 						if (IsArray)
-						    std::cerr << "Using delete[] on new" << std::endl;
+							std::cerr << "Using delete[] on new" << std::endl;
 						else
-					        std::cerr << "Using delete on new[]" << std::endl;
+							std::cerr << "Using delete on new[]" << std::endl;
 					MemoryUsed -= It->second.Size;
 					MemoryMap.erase(It);					
 				}
@@ -168,25 +171,25 @@ namespace TE
 	};
 }
 
-inline 
+	inline 
 void* operator new(size_t Size, const char* File, int Line)
 {
 	return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, false));
 }
 
-inline 
+	inline 
 void* operator new[](size_t Size, const char* File, int Line)
 {
 	return (TE::simple_memory_manager::instance().Alloc(Size, File, Line, true));
 }
 
-inline
+	inline
 void operator delete(void* Ptr, const char* File, int Line)
 {
 	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, false);
 }
 
-inline
+	inline
 void operator delete[](void* Ptr, const char* File, int Line)
 {
 	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, true);
@@ -197,18 +200,19 @@ void operator delete[](void* Ptr, const char* File, int Line)
 //Macros to hook new and delete keywords
 #define DEBUG_NEW new(__FILE__, __LINE__)
 #if _REDEFINED_NEW
-	#define new DEBUG_NEW	
-    inline
-	void operator delete(void* Ptr)
-	{
-		TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, false);
-	}
+#define new DEBUG_NEW	
 
-    inline
-	void operator delete[](void* Ptr)
-	{
-		TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, true);
-	}
+	inline
+void operator delete(void* Ptr)
+{
+	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, false);
+}
+
+	inline
+void operator delete[](void* Ptr)
+{
+	TE::simple_memory_manager::instance().Release(Ptr, nullptr, 0, true);
+}
 #endif
 
 # ifdef _HOOK_MALLOC

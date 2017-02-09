@@ -1,10 +1,13 @@
-/* ========================================================================
-    $File: TERenderer\sprite.cpp $
-    $Created: 01-01-2017 00h00m00s $
-    $Modified: 02-02-2017 11h57m31s $
-    $Revision: $
-    $Creator : TOFFANIN Marc $
-    $Notice: Licensed under GNU GPL $
+// This is an independent project of an individual developer. Dear PVS-Studio, please check it.
+
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+/* ======================================================================== 
+   $File: TERenderer\sprite.cpp $
+   $Created: 01-01-2017 00h00m00s $
+   $Modified: 06-02-2017 09h51m30s $
+   $Revision: $
+   $Creator : TOFFANIN Marc $
+   $Notice: Licensed under GNU GPL $
    ======================================================================== */
 #include "sprite.h"
 #include "TECore\actor.h"
@@ -60,20 +63,20 @@ namespace TE
 				Math::vec3f NewVertex;
 				NewVertex = SpriteCenter - (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
-				{ 0.f, 0.f, 1.f },
-				{ 0.f, 1.f } });
+						{ 0.f, 0.f, 1.f },
+						{ 0.f, 1.f } });
 				NewVertex = SpriteCenter + (Axis.Right*_Size.x) - (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
-				{ 0.f, 0.f, 1.f },
-				{ 1.f, 1.f } });
+						{ 0.f, 0.f, 1.f },
+						{ 1.f, 1.f } });
 				NewVertex = SpriteCenter - (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
-				{ 0.f, 0.f, 1.f },
-				{ 0.f, 0.f } });
+						{ 0.f, 0.f, 1.f },
+						{ 0.f, 0.f } });
 				NewVertex = SpriteCenter + (Axis.Right*_Size.x) + (Axis.Up*_Size.y);
 				Vertices.push_back({ NewVertex,
-				{ 0.f, 0.f, 1.f },
-				{ 1.f, 0.f } });
+						{ 0.f, 0.f, 1.f },
+						{ 1.f, 0.f } });
 
 				if (_Quad)
 					_Quad->Update(Vertices);
