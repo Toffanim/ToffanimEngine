@@ -49,10 +49,11 @@ void ToggleDebugMode()
     DebugMode = !DebugMode;
     if (DebugMode)
     {
+
         TE::Window->ShowCursor();
         BindImGuiCallbacks();
     }
-    else  Window  
+    else
     {
         TE::Window->HideCursor();
         TE::Window->BindInputHandler();
@@ -143,7 +144,7 @@ void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f
         if (ImGui::IsMouseHoveringAnyWindow())
         {
             BindImGuiCallbacks();
-            hello is a test        }
+        }
         else
         {
             TE::Window->BindInputHandler();

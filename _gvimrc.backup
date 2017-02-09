@@ -1,23 +1,134 @@
+"
+" --------------------------------------------------------------------------------------------------
+"                                      VARIABLES AND SET OPTIONS
+" --------------------------------------------------------------------------------------------------
+
+let mapleader = " "
+
+
+" We don't want Vim to pretend to be Vi
 set nocompatible
+
+" Always try to source .vimrc in directory after reading this main vimrc
+set exrc
+
+" Enable plugins
+filetype plugin on
+filetype plugin indent on
+
+set cursorline    " highlight the current line
+
+" Show the line and column number of the cursor position, separated by a
+" comma.  When there is room, the relative position of the displayed
+" text in the file is shown on the far right:
 set ruler
-set smartindent
+
+" Copy indent from current line when starting a new line (typing <CR>
+" in Insert mode or when using the "o" or "O" command).  If you do notset autoindent
+" type anything on the new line except <BS> or CTRL-D and then typeset smartindent
+" <Esc>, CTRL-O or <CR>, the indent is deleted again.  Moving the cursorset splitbelow
+" to another line has the same effect, unless the 'I' flag is includedset splitright
+" in 'cpoptions'.
 set autoindent
+
+" Do smart autoindenting when starting a new line.  Works for C-like
+" programs, but can also be used for other languages.  'cindent' does
+" something like this, works better in most cases, but is more strict,
+" see |C-indenting|.  When 'cindent' is on or 'indentexpr' is set,
+" setting 'si' has no effect.  'indentexpr' is a more advanced
+" alternative.	
+set smartindent
+
 set splitbelow
 set splitright
+
+
+" Like 'autowrite', but also used for commands ":edit", ":enew", ":quit",
+"	":qall", ":exit", ":xit", ":recover" and closing the Vim window.
+"	Setting this option also implies that Vim behaves like 'autowrite' has
+"	been set.
 set autowriteall
+
+" Print the line number in front of each line.  When the 'n' option is
+" excluded from 'cpoptions' a wrapped line will not use the column of
+" line numbers (this is the default when 'compatible' isn't set).
+" The 'numberwidth' option can be used to set the room used for the line
+" number.	
 set number
+
+" Completion mode that is used for the character specified with 'wildchar'. 
+" @Incomplete : Watch exactly is the wildmode that we want ?
 set wildmode=longest:list,full
+
+" When 'wildmenu' is on, command-line completion operates in an enhanced
+" mode.  On pressing 'wildchar' (usually <Tab>) to invoke completion,
+" the possible matches are shown just above the command line, with the
+" first match highlighted (overwriting the status line, if there is
+" one).  Keys that show the previous/next match, such as <Tab> or
+" CTRL-P/CTRL-N, cause the highlight to move to the appropriate match.
+" When 'wildmode' is used, "wildmenu" mode is used where "full" is
+" specified.  "longest" and "list" do not start "wildmenu" mode.	
 set wildmenu
+
+
+" Set recursive name finding with file command
+set path+=**
+
+" Influences the working of <BS>, <Del>, CTRL-W and CTRL-U in Insert
+" mode.  This is a list of items, separated by commas.  Each item allows
+" a way to backspace over something:
+" value	effect	~
+" indent	allow backspacing over autoindent
+" eol	allow backspacing over line breaks (join lines)
+" start	allow backspacing over the start of insert; CTRL-W and CTRL-U
+" stop once at the start of insert.
 set backspace=indent,eol,start
+
+
+set shiftround
+set expandtab
+
+
+"If in Insert, Replace or Visual mode put a message on the last line.
 set showmode
+set showcmd       " display incomplete command
+
+" When set, a forward slash is used when expanding file names.  This is
+" useful when a Unix-like shell is used instead of command.com or
+" cmd.exe.  Backward slashes can still be typed, but they are changed to
+" forward slashes by Vim.
 set shellslash
 
+" Control verbosity of vim
 set verbose=0
 
+" Clipboard = OS clipboard to ba able to copy/paste from/to OS clipboard
+set clipboard=unnamed
+
+" Ignore casing for names
+set ignorecase
+
+" Ignore wasing except is there is at least one capital letter
+set smartcase
+
+" Highlight matched pattern
+set hlsearch
+
+" While typing a search command, show where the pattern, as it was typed so 
+" far, matches.
+set incsearch
+
+" Enable syntax highlighting
 syntax on
 
+" Set custom char for tab, nbsp and trail
+exec "set listchars=tab:\uBB\uBB,nbsp:~,trail:\uB7"
+set list
+
+set visualbell    " stop that ANNOYING beeping
+
 if has('gui_running')
-  colorscheme slate
+  colorscheme toffanim
   set guioptions-=T " no toolbar
   set guioptions-=m " no menu
   set guioptions-=l " no left scroll bar
@@ -26,65 +137,265 @@ if has('gui_running')
   set guioptions-=R " no right scroll bar when split
   set lines=999 columns=999 linespace=0
   if has('gui_win32')
-    set guifont=DejaVu_Sans_Mono:h12:cANSI
+    set guifont=Liberation_Mono:h11.5:cANSI
   else
-    set guifont=DejaVu\ Sans\ Mono\ 12
+    set guifont=Liberation\ Mono\ 11.5
   endif
 endif
 
-func Backspace()
-  if col('.') == 1
-    if line('.')  != 1
-      return  "\<ESC>kA\<Del>"
-    else
-      return ""
-    endif
-  else
-    return "\<Left>\<Del>"
-  endif
-endfunc
-inoremap <BS> <c-r>=Backspace()<CR>
 
-imap <Tab> <C-P>
+let g:FileCreatorName = "TOFFANIN Marc"
 
-let Author = "TOFFANIN Marc"
+" --------------------------------------------------------------------------------------------------
+"                                             FUNCTIONS
+" --------------------------------------------------------------------------------------------------
 
 function! s:insert_gates_header()
   let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
-  execute "normal! i/* ======================================================================== "
-  execute "normal! o    $File: " .expand("%") ." $ "
-  execute "normal! o    $Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
-  execute "normal! o    $Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
+  execute "normal! ggi// This is an independent project of an individual developer. Dear PVS-Studio, please check it."
+  execute "normal! o"
+  execute "normal! o// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com"
+  execute "normal! o/* ======================================================================== "
+  execute "normal! o    $File: " .expand("%") ." $"
+  execute "normal! o    $Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $"
+  execute "normal! o    $Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $"
   execute "normal! o    $Revision: $ "
-  execute "normal! o    $Creator : TOFFANIN Marc $"
-  execute "normal! o    $Notice: Licensed under GNU GPL $"
+  execute "normal! o    $Creator : " . g:FileCreatorName . " $"
+  execute "normal! o    $Notice: Copyright ".strftime("%Y")." by ".g:FileCreatorName." $"
   execute "normal! o   ======================================================================== */ "
   execute "normal! o#if !defined( " . gatename . " )"
   execute "normal! o#define " . gatename . " "
   execute "normal! Go#endif /* " . gatename . " */"
   normal! kk
+  normal! magg=G`a
 endfunction
-autocmd BufNewFile *.{h,hpp} call <SID>insert_gates_header()
-
 
 function! s:insert_gates_unit()
-  let gatename = substitute(toupper(expand("%:t")), "\\.", "_", "g")
-  let filename = substitute(expand("%:t"), "\\.", "", "g")
+  let filename = substitute(expand("%:t"), "\\.cpp", ".h", "")
+  execute "normal! ggi// This is an independent project of an individual developer. Dear PVS-Studio, please check it."
+  execute "normal! o"
+  execute "normal! o// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com"
   execute "normal! i/* ======================================================================== "
   execute "normal! o    $File: " .expand("%") ." $ "
   execute "normal! o    $Created: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
   execute "normal! o    $Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $ "
   execute "normal! o    $Revision: $ "
-  execute "normal! o    $Creator : TOFFANIN Marc $"
-  execute "normal! o    $Notice: Licensed under GNU GPL $"
+  execute "normal! o    $Creator : ". g:FileCreatorName ." $"
+  execute "normal! o    $Notice: Copyright ".strftime("%Y")." by ".g:FileCreatorName." $"
   execute "normal! o   ======================================================================== */ "
-  execute "normal! o#include \"" . filename .".h\""
+  execute "normal! o#include \"" . filename ."\""
   normal! kk
+  normal! magg=G`a
 endfunction
-autocmd BufNewFile *.{c,cpp} call <SID>insert_gates_unit()
-autocmd BufWritePre,FileWritePre *.{h,hpp,c,cpp} execute "normal! 4GddO$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $"
 
-autocmd VimEnter * vsp  " Split window verticaly at startup
-autocmd VimResized * wincmd =  " equalized split width when resizing window
-autocmd InsertEnter,InsertLeave * set cul! " Change cursor when changing mode
+function! s:update_modify()
+  execute "normal! gg"
+  execute "/Modified"
+  let match_line = line('.')
+  if match_line > 0 && match_line < 10
+    execute "normal! mbcc$Modified: " .strftime("%d-%m-%Y %Hh%Mm%Ss") . " $<Esc>`b"
+  endif
+  execute ":silent ! ctags -R . &"
+endfunction
+
+command! -complete=shellcmd -nargs=+ Shell call s:RunShellCommand(<q-args>)
+function! s:RunShellCommand(cmdline)
+  echo a:cmdline
+  let expanded_cmdline = a:cmdline
+  for part in split(a:cmdline, ' ')
+     if part[0] =~ '\v[%#<]'
+        let expanded_part = fnameescape(expand(part))
+        let expanded_cmdline = substitute(expanded_cmdline, part, expanded_part, '')
+     endif
+  endfor
+  botright new
+  setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nowrap
+  call setline(1, 'You entered:    ' . a:cmdline)
+  call setline(2, 'Expanded Form:  ' .expanded_cmdline)
+  call setline(3,substitute(getline(2),'.','=','g'))
+  execute '$read !'. expanded_cmdline
+  setlocal nomodifiable
+  1
+endfunction
+
+"here is a more exotic version of my original Kwbd script
+"delete the buffer; keep windows; create a scratch buffer if no buffers left
+function! s:Kwbd(kwbdStage)
+  if(a:kwbdStage == 1)
+    if(!buflisted(winbufnr(0)))
+      bd!
+      return
+    endif
+    let s:kwbdBufNum = bufnr("%")
+    let s:kwbdWinNum = winnr()
+    windo call s:Kwbd(2)
+    execute s:kwbdWinNum . 'wincmd w'
+    let s:buflistedLeft = 0
+    let s:bufFinalJump = 0
+    let l:nBufs = bufnr("$")
+    let l:i = 1
+    while(l:i <= l:nBufs)
+      if(l:i != s:kwbdBufNum)
+        if(buflisted(l:i))
+          let s:buflistedLeft = s:buflistedLeft + 1
+        else
+          if(bufexists(l:i) && !strlen(bufname(l:i)) && !s:bufFinalJump)
+            let s:bufFinalJump = l:i
+          endif
+        endif
+      endif
+      let l:i = l:i + 1
+    endwhile
+    if(!s:buflistedLeft)
+      if(s:bufFinalJump)
+        windo if(buflisted(winbufnr(0))) | execute "b! " . s:bufFinalJump | endif
+      else
+        enew
+        let l:newBuf = bufnr("%")
+        windo if(buflisted(winbufnr(0))) | execute "b! " . l:newBuf | endif
+      endif
+      execute s:kwbdWinNum . 'wincmd w'
+    endif
+    if(buflisted(s:kwbdBufNum) || s:kwbdBufNum == bufnr("%"))
+      execute "bd! " . s:kwbdBufNum
+    endif
+    if(!s:buflistedLeft)
+      set buflisted
+      set bufhidden=delete
+      set buftype=
+      setlocal noswapfile
+    endif
+  else
+    if(bufnr("%") == s:kwbdBufNum)
+      let prevbufvar = bufnr("#")
+      if(prevbufvar > 0 && buflisted(prevbufvar) && prevbufvar != s:kwbdBufNum)
+        b #
+      else
+        bn
+      endif
+    endif
+  endif
+endfunction
+
+command! Kwbd call s:Kwbd(1)
+nnoremap <silent> <Plug>Kwbd :<C-u>Kwbd<CR>
+
+" --------------------------------------------------------------------------------------------------
+"                                            AUTOCMDS
+" --------------------------------------------------------------------------------------------------
+
+" Insert file header to .h / .hpp files when creating such files
+autocmd BufNewFile *.{h,hpp} call <SID>insert_gates_header()
+
+" Insert file header to .c / .cpp files when creating such files
+autocmd BufNewFile *.{c,cpp} call <SID>insert_gates_unit()
+
+" Update Modified field of file header when changes are saved
+autocmd BufWritePre,FileWritePre *.{h,hpp,c,cpp} call <SID>update_modify()
+
+" Split window verticaly at startup
+autocmd VimEnter * vsp  
+
+" equalized split width when resizing window
+autocmd VimResized * wincmd =  
+
+" Change cursor between Normal/Insert modes
+" autocmd InsertEnter,InsertLeave * set cul!
+
+" open quickfix window after a make
+autocmd QuickFixCmdPost [^l]* nested cwindow
+
+" Save with <C-S>"
+noremap <silent> <C-S>          :update<CR>
+vnoremap <silent> <C-S>         <C-C>:update<CR>
+inoremap <silent> <C-S>         <C-O>:update<CR>
+
+" Quickly close windows
+nnoremap <leader>q :Kwbd<cr>
+nnoremap <leader>x :x<cr>
+nnoremap <leader>X :q!<cr>
+
+" No auto comment insertion
+autocmd FileType * setlocal formatoptions-=c formatoptions-=r formatoptions-=o
+
+
+" --------------------------------------------------------------------------------------------------
+"                                 NORMAL MODE SHORTCUTS AND MAPPING
+" --------------------------------------------------------------------------------------------------
+
+" Navigation
+nnoremap    i      k
+nnoremap    j      h
+nnoremap    k      j
+nnoremap    l      l
+nnoremap    h      i
+
+nmap    J          B
+nmap    I          {
+nmap    K          }
+nmap    L          W     
+
+" switch from .h to .cpp if it can
+nmap    <Leader-k>       :e %:p:s,.h$,.X123X,:s,.cpp$,.h,:s,.X123X$,.cpp,<CR>
+
+" <Leader>         Set Marker
+nmap    <Leader><Leader>    ma
+
+" d + <Leader>     Delete To Marker
+nmap    d<Leader>   d`a
+
+" y + <Leader>     Yank to Marker
+nmap    y<Leader>   y`a
+
+" <S> + <Leader>   Goto Marker
+nmap    <S-Leader>  `a  
+
+" Insert line without entering insert mode
+nmap    <S-Enter>     O<Esc>
+nmap    <CR>          o<Esc>
+
+" Map ù to ^ to avoid typing <CR>
+nnoremap     ù            ^
+
+" Indent file with S-Tab
+nnoremap <S-tab> magg=G`a
+inoremap <S-tab> <Esc>magg=G`aa
+
+" Quicker window movement
+nnoremap <C-i> <C-w>k
+nnoremap <C-k> <C-w>j
+nnoremap <C-j> <C-w>h
+nnoremap <C-l> <C-w>l
+
+nnoremap <F4> :make
+
+nnoremap <silent> <Leader>/ :noh<cr> " Stop highlight after searching
+
+" --------------------------------------------------------------------------------------------------
+"                                  INSERT MODE SHORTCUTS AND MAPPING
+" --------------------------------------------------------------------------------------------------
+
+inoremap   <tab>      <C-n>
+inoremap   <S-tab>    <C-p>
+inoremap   <C-c>      <Esc>
+
+" --------------------------------------------------------------------------------------------------
+"                                        NETRW PLUGIN SPECIFICS
+" --------------------------------------------------------------------------------------------------
+
+let g:netrw_banner=0
+let g:netrw_browse_split=4
+let g:netrw_altv=1
+let g:netrw_liststyle=3
+
+
+
+
+
+
+
+"---------------------------------------------------------------------------------------------------------
+"                                       EMBED FUGITIVE GIT PLUGIN
+"---------------------------------------------------------------------------------------------------------
+
 
