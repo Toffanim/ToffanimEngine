@@ -127,6 +127,10 @@ STATIC / CONSTEXPR ALIASES
 
 CONST CORRECTNESS
 
++ Put const on the right of the thing that is const :
+    Object * const obj;        // read right-to-left:  const pointer to Object
+    Object const * obj;        // read right-to-left:  pointer to const Object
+    Object const * const obj;  // read right-to-left:  const pointer to const Object
 + Declare all "read-only" variables const
 + Never use const on return value
 + Put the const keyword on the end when making a pointer itself const  :  const int * const Ptr = nullptr;

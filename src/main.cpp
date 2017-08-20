@@ -4,7 +4,7 @@
 /* ======================================================================== 
    $File: main.cpp $
    $Created: 01-01-2017 00h00m00s $
-   $Modified: 09-02-2017 06h22m07s $<Esc>`b
+   $Modified: 24-02-2017 01h56m01s $
    $Revision: $
    $Creator : TOFFANIN Marc $
    $Notice: Licensed under GNU GPL $
@@ -25,11 +25,31 @@ using namespace TE;// <= Using namesapce TE to save time
 // ------ Coordinate system ------
 //Check rotations in good coordinate system
 
+enum class flags_test {
+    flag_1 = 0x1,
+    flag_2 = 0x2,
+    flag_3 = 0x4,
+    flag_4 = 0x8
+};
+
+using flag_test_flags = flags<flags_test>;
+
+inline
+flag_test_flags operator|( flags_test bit0, flags_test bit1 )
+{
+    return (flag_test_flags( bit0 ) | bit1);
+}
+
+inline
+flag_test_flags operator~( flags_test bits )
+{
+    return ~(flag_test_flags( bits ) );
+}
 
 static bool Continue = true;
 static bool DebugMode = false;
 
-void CloseApp()
+void CloseApp(void)
 {
     Continue = false;
 }
@@ -42,6 +62,7 @@ void BindImGuiCallbacks()
     glfwSetKeyCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_KeyCallback);
     glfwSetCharCallback(TE::Window->GetHandle(), ImGui_ImplGlfwGL3_CharCallback);
     glfwSetCursorPosCallback(TE::Window->GetHandle(), NULL);
+
 }
 
 void ToggleDebugMode()
@@ -49,7 +70,6 @@ void ToggleDebugMode()
     DebugMode = !DebugMode;
     if (DebugMode)
     {
-
         TE::Window->ShowCursor();
         BindImGuiCallbacks();
     }
@@ -72,7 +92,11 @@ void Update()
 
 }
 
-void RenderFrame(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f& Projection, /*to delete*/ const Renderer::shader& BlitShader, const Core::vertex_array& UnitQuad, Renderer::skybox* skybox)
+void RenderFrame(const Physic::bvh_object_list& Scene, 
+        const mat4f& View, const mat4f& Projection, 
+        /*to delete*/ const Renderer::shader& BlitShader, 
+        const Core::vertex_array& UnitQuad, 
+        Renderer::skybox* skybox)
 {
     TIMED_FUNCTION();
 
@@ -132,7 +156,7 @@ void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f
         glGetIntegerv(GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX,
                 &cur_avail_mem_kb);
         auto VRAMUsed = total_mem_kb - cur_avail_mem_kb;
-        ImGui::Text("PROGRAM RAM : %.2f MB", simple_memory_manager::instance().MemoryUsed / (double)Megabytes(1));
+        ImGui::Text("PROGRAM RAM : %.2f MB", TE::simple_memory_manager::instance().MemoryUsed / (double)Megabytes(1));
         ImGui::Text("SYSTEM VRAM : %d / %d (%.2f %% used)", VRAMUsed / Kilobytes(1), total_mem_kb / Kilobytes(1), (VRAMUsed / (double)total_mem_kb)*100.f);
 
         std::sort(GlobalDebugEventList.begin(), GlobalDebugEventList.end(), [](const debug_event& a, const debug_event& b) { return (a.CyclesCount > b.CyclesCount); });
@@ -160,7 +184,7 @@ void Render(const Physic::bvh_object_list& Scene, const mat4f& View, const mat4f
 
 
     TE::Window->SwapBuffers();
-    Core::CheckOpenGLError("end frame");
+    TE::Core::CheckOpenGLError("end frame");
 }
 
 //Launch game
@@ -318,8 +342,12 @@ int main(int argc, char** argv)
     WindowController->AddKeyBind(std::make_pair<int, int>(TE::Core::KP_3, TE::Core::PRESS), &ToggleDebugMode);
 
 
+    flags<flags_test> Flags;
+    Flags = flags_test::flag_1 | flags_test::flag_2;
+
+
     //Main loop
-    while (Continue && Window->Running())
+    while (Continue && TE::Window->Running())
     {
         BEGIN_FRAME();
         TestFunction();

@@ -10,3 +10,8 @@ set makeprg=build
 set errorformat=%c>%f(%l):\ error\ %t%n:\ %m
 " launch application 
 nnoremap <F5> :!start /D C:\Users\toffanim\Documents\GitHub\ToffanimEngine\build build\Debug\engine.exe<CR>
+
+
+"Set tag file
+
+set tags=C:\Users\toffanim\Documents\GitHub\ToffanimEngine\tags;

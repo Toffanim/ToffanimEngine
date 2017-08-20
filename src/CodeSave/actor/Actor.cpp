@@ -1,15 +1,16 @@
 // This is an independent project of an individual developer. Dear PVS-Studio, please check it.
 
-// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
+// PVS-Studio Static Code Analyzer or C, C++ and C#: http://www.viva64.com
 /* ======================================================================== 
    $File: $
    $Date: $
-   $Modified: 08-02-2017 13h41m05s $
+   $Modified: 13-02-2017 10h35m04s $
    $Creator:  $
    $Notice:  $
    ======================================================================== */
 #include "Actor.h"
 using namespace std;
+
 //Main actor class from which every actor in the scene (chest, monster, wall, water) will inherits
 
 

@@ -1,0 +1,72 @@
+VIM EXPRESS CHEATSHEET
+
+<VANILLA COMMAND>    <MAPPING KEY>    <FUNCTION>
+
+NOTES
+
+<SHIFT>      SHIFT generally do the opposite of a function
+             for instance 'o' create a new line above and 'O' below,
+             'f' is forward, 'F' is backward, etc
+
+
+<hjkl>     <jkil>    Cursor movement
+
+TEXT OBJECT
+
+w            Words
+s            Sentence
+p            Paragraphe
+t            Tags
+B            Block {}
+b            Block ()
+
+COMMAND
+
+d            Delete or cut
+dd           Cut line
+D            Delete until end of line
+y            Yank
+yy           Yank line
+c            (Change) Delete and go to insert mode
+cc           (Change) Delete line and go to insert mode
+C            (Change) Delete until end of line and go to insert mode
+r            Replace one character without going to insert mode
+v            Visual Mode
+.            Repeat last command (can do motion between commands)
+
+i    h       Go to insert mode before cursor
+o            Insert new line above and go to insert mode
+O            Insert new line below and go to insert mode
+a            (Append) Go to insert mode after cursor
+
+MOTIONS
+
+a            all : generally imply other text object + special char like ( { [ \n ] } )
+i            in
+t            until
+f            find forward
+F            find backward
+^    (ù)     move to the beginning (non-whitespace char) of line
+$            move to the end of line
+
+MACROS
+
+q<char>      Start recording in register <char>
+q            Stop recording
+@<char>      Play macro in register <char>
+
+MARKS
+
+ma    <Space><Space>    Set Mark a
+`a    <S-Space>        Go to mark a
+
+SEARCH
+
+
+
+USER DEFINED SHORTCUTS
+
+<Space-k>    Switch between .cpp/.h files
+<S-Tab>      Indent all file
+<F4>         :make
+<F5>         execute build .exe
