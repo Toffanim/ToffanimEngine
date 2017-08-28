@@ -7,9 +7,10 @@ set shiftwidth=4
 " build exec when calling :make command
 set makeprg=build
 " error format after :make command to be able to jump to errors
-set errorformat=%c>%f(%l):\ error\ %t%n:\ %m
+" set errorformat=%c>%f(%l):\ error\ %t%n:\ %m
+" set errorformat=\ %#%f(%l\\\,%c):\ %m
 " launch application 
-nnoremap <F5> :!start /D C:\Users\toffanim\Documents\GitHub\ToffanimEngine\build build\Debug\engine.exe<CR>
+nnoremap <F5> :! executeTE<CR>
 
 
 "Set tag file

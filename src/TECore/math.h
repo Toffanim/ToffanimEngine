@@ -4,7 +4,7 @@
 /* ======================================================================== 
     $File: TECore\math.h $
     $Created: 01-01-2017 00h00m00s $
-    $Modified: 06-02-2017 07h50m23s $
+    $Modified: 22-08-2017 01h07m00s $
     $Revision: $
     $Creator : TOFFANIN Marc $
     $Notice: Licensed under GNU GPL $
@@ -56,6 +56,7 @@ namespace TE
 					return 1;
 				if (DiffZ > DiffX || DiffZ > DiffY)
 					return 2;
+                return(0);
 			}
 		};
 

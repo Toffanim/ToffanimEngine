@@ -4,7 +4,7 @@
 /* ======================================================================== 
     $File: TECore\input_handler.h $
     $Created: 01-01-2017 00h00m00s $
-    $Modified: 06-02-2017 07h50m23s $
+    $Modified: 22-08-2017 01h15m33s $
     $Revision: $
     $Creator : TOFFANIN Marc $
     $Notice: Licensed under GNU GPL $
@@ -68,17 +68,17 @@ namespace TE
 			std::vector<std::shared_ptr<input_component>> _Controllers;
 		};
 
-		static void KeyboardCallback(GLFWwindow* Window, int Key, int Scancode, int Action, int Mods)
+		static void KeyboardCallback(GLFWwindow* , int Key, int Scancode, int Action, int Mods)
 		{
 			TE::DefaultInputHandler->DispatchKey(Key, Action);
 		}
 
-		static void MouseCursorCallback(GLFWwindow* Window, double XPos, double YPos)
+		static void MouseCursorCallback(GLFWwindow* , double XPos, double YPos)
 		{
 			TE::DefaultInputHandler->DispatchMouseCursor(XPos, YPos);
 		}
 
-		static void MouseCallback(GLFWwindow* Window, int Button, int Action, int Mods)
+		static void MouseCallback(GLFWwindow*, int Button, int Action, int Mods)
 		{
 			TE::DefaultInputHandler->DispatchMouseKey(Button, Action);
 		}

@@ -141,6 +141,22 @@ add_library( stb STATIC ${STB_SRC} )
 set_property(TARGET stb PROPERTY FOLDER STB)
 target_link_libraries( engine stb )
 
+
+#EASTL
+if( NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/EASTL/CMakeLists.txt")
+    # Could not find EASTL
+    message("Unable to find EASTL")
+	# Clone the submodule
+	execute_process(COMMAND git submodule update --init -- lib/EASTL
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+else()
+    message("Library EASTL detected")
+endif()
+add_subdirectory(lib/EASTL)
+set_property(TARGET EASTL PROPERTY FOLDER EASTL)
+set_property(TARGET EABase_ide PROPERTY FOLDER EASTL)
+target_link_libraries(engine EASTL)
+
 #GLEW
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/lib/glew/include")
 file(GLOB GLEW_SRC

@@ -9,10 +9,13 @@
    $Creator : TOFFANIN Marc $
    $Notice: Licensed under GNU GPL $
    ======================================================================== */
+
 #include <stdlib.h>
 #include <array>
 #include <iostream>
+
 using namespace std;
+ 
 
 #include "engine.h"
 using namespace TE;// <= Using namesapce TE to save time

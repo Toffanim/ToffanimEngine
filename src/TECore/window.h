@@ -4,7 +4,7 @@
 /* ======================================================================== 
     $File: TECore\window.h $
     $Created: 01-01-2017 00h00m00s $
-    $Modified: 06-02-2017 07h50m24s $
+    $Modified: 22-08-2017 01h17m31s $
     $Revision: $
     $Creator : TOFFANIN Marc $
     $Notice: Licensed under GNU GPL $
@@ -47,16 +47,16 @@ namespace TE
 			*/
 			window(int Width, int Height, std::string Title = "Default");
 
-			static void ResizeCallback(GLFWwindow* Window, int width, int height)
+			static void ResizeCallback(GLFWwindow* window, int width, int height)
 			{
-				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(Window));
+				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(window));
 				_Window->SetWidth( width );
 				_Window->SetHeight( height );
 			}
 
-			static void CloseCallback(GLFWwindow* Window)
+			static void CloseCallback(GLFWwindow* window)
 			{
-				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(Window));
+				auto _Window = static_cast<window*>(glfwGetWindowUserPointer(window));
 				_Window->Close();
 			}
 

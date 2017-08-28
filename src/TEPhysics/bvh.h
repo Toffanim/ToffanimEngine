@@ -4,7 +4,7 @@
 /* ======================================================================== 
     $File: TEPhysics\bvh.h $
     $Created: 01-01-2017 00h00m00s $
-    $Modified: 06-02-2017 07h50m24s $
+    $Modified: 22-08-2017 01h20m39s $
     $Revision: $
     $Creator : TOFFANIN Marc $
     $Notice: Licensed under GNU GPL $
@@ -52,7 +52,7 @@ namespace TE
 		public:
 			bvh(bvh_object_list& Objects)
 			{
-				Build(Objects, nullptr, 0, Objects.size());
+				Build(Objects, nullptr, 0, (const unsigned int)Objects.size());
 			}
 
 
@@ -65,7 +65,7 @@ namespace TE
 				// NOTE(MArc) : This is unpack, because if we do
 				// return (ProcessNode(*Tree[0]->Left, Ray) || ProcessNode(*Tree[0]->Right, Ray));
 				// and the first exp is True, then the second exp is not evaluated
-				bool ResultLeft, ResultRight;
+                bool ResultLeft=false, ResultRight = false;
 				if (Tree[0]->Left)
 					ResultLeft = ProcessNode(*Tree[0]->Left, Ray);
 				if (Tree[0]->Right)
@@ -109,7 +109,7 @@ namespace TE
 						// NOTE(MArc) : This is unpack, because if we do
 						// return (ProcessNode(*Tree[0]->Left, Ray) || ProcessNode(*Tree[0]->Right, Ray));
 						// and the first exp is True, then the second exp is not evaluated
-						bool ResultLeft, ResultRight;
+						bool ResultLeft=false, ResultRight=false;
 						if (Node.Left)
 							ResultLeft = ProcessNode(*Node.Left.get(), Ray);
 						if (Node.Right)
@@ -157,7 +157,7 @@ namespace TE
 				//Create root the first time we got in the function
 				if (!Parent)
 				{
-					Tree.push_back(std::make_unique<bvh_node>(bvh_node::ROOT, ComputeNodeAABB(Objects, 0, Objects.size())));
+					Tree.push_back(std::make_unique<bvh_node>(bvh_node::ROOT, ComputeNodeAABB(Objects, 0, (int)Objects.size())));
 					Parent = Tree.back();
 					const unsigned int SplitIndex = Start + (End - Start) / 2;
 					//Recursively build left child
