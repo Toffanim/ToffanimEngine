@@ -12,4 +12,4 @@
 	url = https://github.com/nothings/stb
 [submodule "lib/EASTL"]
 	path = lib/EASTL
-	url = https://github.com/electronicarts/EASTL
+	url = git://github.com/electronicarts/EASTL
