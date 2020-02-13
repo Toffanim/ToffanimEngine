@@ -142,7 +142,13 @@ target_link_libraries( engine opengl32 )
 
 #VULKAN
 include_directories("C:/VulkanSDK/1.2.131.1/Include")
-link_directories("C:/VulkanSDK/1.2.131.1/Lib32")
-target_link_libraries(engine vulkan-1)
+if( "${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
+find_library(VULKAN_LIBRARY vulkan-1 HINTS C:/VulkanSDK/1.2.131.1/Lib) 
+else ()
+find_library(VULKAN_LIBRARY vulkan-1 HINTS C:/VulkanSDK/1.2.131.1/Lib32)
+endif()
+target_link_libraries(engine ${VULKAN_LIBRARY})
+
+set_property(TARGET engine PROPERTY CXX_STANDARD 17)
 
 set_property(TARGET uninstall PROPERTY FOLDER CMakePredefinedTargets)
