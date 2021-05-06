@@ -9,6 +9,10 @@
     $Creator : TOFFANIN Marc $
     $Notice: Licensed under GNU GPL $
    ======================================================================== */
+
+
+#if 0
+
 #if !defined(WINDOW_H)
 #define WINDOW_H
 //NOTE(Marc) : Always call glew before any openGL context creation (GLFW, SDL, etc...)
@@ -140,3 +144,4 @@ namespace TE
 }
 #endif
 
+#endif

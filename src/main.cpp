@@ -10,6 +10,8 @@
    $Notice: Licensed under GNU GPL $
    ======================================================================== */
 
+
+#if 0
 #include <stdlib.h>
 #include <array>
 #include <iostream>
@@ -368,3 +370,10 @@ int main(int argc, char** argv)
     TE_Clean();
     return(0);
 }
+
+#endif
+
+
+#include "TECore/window.cpp"
+
+

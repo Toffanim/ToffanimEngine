@@ -11,6 +11,8 @@
    ======================================================================== */
 #include "window.h"
 
+#if 0
+
 namespace TE
 {
 	namespace Core
@@ -122,3 +124,14 @@ namespace TE
 		}
 	}
 }
+
+#endif
+
+
+#ifdef _TE_WIN32_
+#include "plateform_win32.cpp"
+#endif
+
+#ifdef __EMSCRIPTEN__
+#include "plateform_openglES_web.cpp"
+#endif
