@@ -135,3 +135,7 @@ namespace TE
 #ifdef __EMSCRIPTEN__
 #include "plateform_openglES_web.cpp"
 #endif
+
+#ifdef __ANDROID__
+#include "plateform_openglES_android.cpp"
+#endif

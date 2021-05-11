@@ -1,6 +1,6 @@
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
-#include "../../emsdk/upstream/emscripten/system/include/emscripten/emscripten.h"
+#include "../../lib/emsdk/upstream/emscripten/system/include/emscripten/emscripten.h"
 #include <iostream>
 
 const char *vertexShaderSource = "#version 100\n"

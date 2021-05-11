@@ -4,10 +4,35 @@ Objectives : Simple demonstration of modern real-time realistic rendering techni
 This is not a good coding examples data base or whatnot. If the idea of using this software crossed your mind at some point (I sincerely hope that you don't), DON'T USE THIS SOFTWARE FOR PRODUCTIONS
 
 #HOW TO BUILD
+
+OLD WAYS (Not maintained)
+
 (Tested only on windows for now)
 - mkdir build && cd build/
 - cmake ..  [-G Visual Studio 14 2015 Win64]
 - then execute build/ToffanimEngine.sln with visual studio
+
+
+NEW WAY
+
+On Windows
+
+Make cl.exe vs compiler available in your path : vcvarsall x64
+Use the src/build.bat win64
+execut build/main.exe
+
+For Web
+
+Use the src/build.bat web
+emrun build/main.html
+
+For android
+
+Install all the tools in lib/android_sdk/cmdline-tools/latest
+lib/android_sdk/cmdline-tools/latest/sdkmanager "plateform-tools" "ndk-bundle" "build-tools;VERSION" ("emulator" not compulsory)
+then compile :
+
+
 
 /!\ IMPORTANT /!\ If the build fails, it is surely because you don't have "git" in your PATH variable,
 so you may have to update the submodules by hand with :
