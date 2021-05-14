@@ -3,26 +3,32 @@
 #include "../../lib/emsdk/upstream/emscripten/system/include/emscripten/emscripten.h"
 #include <iostream>
 
-const char *vertexShaderSource = "#version 100\n"
-    "varying vec3 aPos;\n"
+const char *vertexShaderSource = "#version 300 es\n"
+    "layout (location = 0) in mediump vec3 aPos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
-const char *fragmentShaderSource = "#version 100\n"
+const char *fragmentShaderSource = "#version 300 es\n"
+    "out mediump vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "   gl_FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
-
+	
+	struct data {
+		GLuint shader;
+		GLuint VAO;
+	};
+	
 void mainLoop(void* userData) {
-	   glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-unsigned int shaderProgram = *((unsigned int*)userData);
-        // draw our first triangle
-        glUseProgram(shaderProgram);
-        //glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+data* d = (data*)userData;
+       // draw our first triangle
+        glUseProgram(d->shader);
+        glBindVertexArray(d->VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
@@ -31,6 +37,7 @@ unsigned int shaderProgram = *((unsigned int*)userData);
 int main() {
 	
 	std::cout << "HELLO WORLD" << std::endl;
+	data d;
 	
 	EGLDisplay Display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	
@@ -128,6 +135,7 @@ int main() {
     }
     // link shaders
     unsigned int shaderProgram = glCreateProgram();
+	d.shader = shaderProgram;
     glAttachShader(shaderProgram, vertexShader);
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
@@ -154,6 +162,7 @@ int main() {
     };
     unsigned int VBO, VAO, EBO;
     glGenVertexArrays(1, &VAO);
+	d.VAO = VAO;
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
@@ -178,7 +187,7 @@ int main() {
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
 
-    emscripten_set_main_loop_arg( mainLoop, &shaderProgram, 0, true );
+    emscripten_set_main_loop_arg( mainLoop, &d, 0, true );
 						// TODO(toffa): cleanup sequence
 		
 	return 0;

@@ -14,7 +14,7 @@ pushd WIN64
 
 del *.pdb > NUL 2> NUL
 
-cl ..\..\src\main.cpp -D_TE_WIN32_ /W4 /nologo /link /SUBSYSTEM:console -incremental:no gdi32.lib opengl32.lib user32.lib kernel32.lib
+call cl ..\..\src\main.cpp -D_TE_WIN32_ /W4 /nologo /link /SUBSYSTEM:console -incremental:no gdi32.lib opengl32.lib user32.lib kernel32.lib
 
 popd
 goto end
@@ -25,8 +25,8 @@ IF %1 == WEB (
 IF NOT EXIST WEB mkdir WEB
 pushd WEB
 
-em++ ..\..\src\main.cpp -o main.html --emrun
-emrun main.html
+call em++ ..\..\src\main.cpp -o main.html --emrun -s MIN_WEBGL_VERSION=2 -s MAX_WEBGL_VERSION=2
+call emrun main.html
 
 popd
 goto end
