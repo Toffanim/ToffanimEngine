@@ -3,86 +3,96 @@
 
 #include "android_native_app_glue.h"
 #include <jni.h>
-
-const char *vertexShaderSource =
-    "#version 100\n"
-    "varying vec3 aPos;\n"
+#include <android/log.h>
+const char *vertexShaderSource = "#version 300 es\n"
+    "layout (location = 0) in mediump vec3 aPos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
-const char *fragmentShaderSource =
-    "#version 100\n"
+const char *fragmentShaderSource = "#version 300 es\n"
+    "out mediump vec4 FragColor;\n"
     "void main()\n"
     "{\n"
-    "   gl_FragColor = vec4(1.0, 0.5, 0.2, 1.0);\n"
+    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
+	
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, "AndroidProject1.NativeActivity", __VA_ARGS__))
+#define LOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, "AndroidProject1.NativeActivity", __VA_ARGS__))
 
-void handle_cmd(android_app *pApp, int32_t cmd) {
-  switch (cmd) {
-  case APP_CMD_INIT_WINDOW: {
+
+struct renderer {
+	struct android_app* app;
+
+	EGLDisplay display = EGL_NO_DISPLAY;
+	EGLSurface surface = EGL_NO_SURFACE;
+	EGLContext context = EGL_NO_CONTEXT;
+	
+	GLuint shaderProgram;
+	GLuint VAO;
+};
+
+void init( renderer* engine ) {
     EGLDisplay Display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 
     if (Display == EGL_NO_DISPLAY) {
+		LOGW("Unable to eglGetDisplkay");
       return;
     }
 
     EGLint Major, Minor;
     if (!eglInitialize(Display, &Minor, &Major)) {
+		LOGW("Unable to eglInititalize");
       return;
     }
 
     // TODO(toffa) : choose the right configuration
-    EGLint const attrib_list[] = {EGL_RED_SIZE,  4, EGL_GREEN_SIZE, 4,
-                                  EGL_BLUE_SIZE, 4, EGL_NONE};
+    EGLint const attrib_list[] = {EGL_SURFACE_TYPE, EGL_WINDOW_BIT, EGL_RED_SIZE,  8, EGL_GREEN_SIZE, 8,
+                                  EGL_BLUE_SIZE, 8, EGL_NONE};
 
     EGLConfig config;
     EGLint config_size = 1;
     EGLint num_config;
     if (!eglChooseConfig(Display, attrib_list, &config, config_size,
                          &num_config)) {
+							 LOGW("Unable to eglChooseConfig");
       return;
     }
 
-    EGLSurface Surface = eglCreateWindowSurface(Display, config, 0, 0);
+    EGLint format;	
+	eglGetConfigAttrib(Display, config, EGL_NATIVE_VISUAL_ID, &format);
+
+	ANativeWindow_setBuffersGeometry(engine->app->window, 0, 0, format);
+
+    EGLSurface Surface = eglCreateWindowSurface(Display, config, engine->app->window, 0);
 
     if (Surface == EGL_NO_SURFACE) {
+		LOGW("Unable to eglCreateWindowSurface");
       return;
     }
 
-    EGLint const attrib_list_context[] = {EGL_CONTEXT_CLIENT_VERSION, 2,
+    EGLint const attrib_list_context[] = {EGL_CONTEXT_CLIENT_VERSION, 3,
                                           EGL_NONE, EGL_NONE};
 
     EGLContext Context =
-        eglCreateContext(Display, config, EGL_NO_CONTEXT, attrib_list_context);
+        eglCreateContext(Display, config, 0, attrib_list_context);
 
     if (Context == EGL_NO_CONTEXT) {
+		LOGW("Unable to eglCreateContext");
       return;
     }
 
     if (!eglMakeCurrent(Display, Surface, Surface, Context)) {
+		LOGW("Unable to eglMakeCurrent");
       return;
     }
-  } break;
-
-  case APP_CMD_TERM_WINDOW:
-    // TODO :: toffa: clenaup
-    break;
-  }
-}
-
-/**
- * Process the next input event.
- */
-static int32_t handle_inputs(struct android_app *app, AInputEvent *event) {
-  return 0;
-}
-
-void android_main(struct android_app *pApp) {
-  pApp->onAppCmd = handle_cmd;
-  pApp->onInputEvent = handle_inputs;
-
-  unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	
+	engine->display = Display;
+	engine->surface = Surface;
+	engine->context = Context;
+	
+	
+	unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
   glShaderSource(vertexShader, 1, &vertexShaderSource, 0);
   glCompileShader(vertexShader);
   // check for shader compile errors
@@ -91,6 +101,7 @@ void android_main(struct android_app *pApp) {
   glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(vertexShader, 512, 0, infoLog);
+	LOGW( "ERROR::SHADER::VERTEX::COMPILATION_FAILED %s\n", infoLog);
   }
   // fragment shader
   unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -100,9 +111,11 @@ void android_main(struct android_app *pApp) {
   glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(fragmentShader, 512, 0, infoLog);
+	LOGW( "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED %s\n", infoLog);
   }
   // link shaders
   unsigned int shaderProgram = glCreateProgram();
+  engine->shaderProgram = shaderProgram;
   glAttachShader(shaderProgram, vertexShader);
   glAttachShader(shaderProgram, fragmentShader);
   glLinkProgram(shaderProgram);
@@ -110,6 +123,7 @@ void android_main(struct android_app *pApp) {
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
   if (!success) {
     glGetProgramInfoLog(shaderProgram, 512, 0, infoLog);
+	LOGW( "ERROR::SHADER::LINKER::COMPILATION_FAILED %s\n", infoLog);
   }
   glDeleteShader(vertexShader);
   glDeleteShader(fragmentShader);
@@ -134,6 +148,7 @@ void android_main(struct android_app *pApp) {
   // bind the Vertex Array Object first, then bind and set vertex buffer(s), and
   // then configure vertex attributes(s).
   glBindVertexArray(VAO);
+  engine->VAO = VAO;
 
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -149,16 +164,61 @@ void android_main(struct android_app *pApp) {
   // as the vertex attribute's bound vertex buffer object so afterwards we can
   // safely unbind
   glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
-  // remember: do NOT unbind the EBO while a VAO is active as the bound element
-  // buffer object IS stored in the VAO; keep the EBO bound.
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+void draw( renderer* engine ) {
+	if (engine->display == NULL) {
+		// No display.
+		return;
+	}
 
-  // You can unbind the VAO afterwards so other VAO calls won't accidentally
-  // modify this VAO, but this rarely happens. Modifying other VAOs requires a
-  // call to glBindVertexArray anyways so we generally don't unbind VAOs (nor
-  // VBOs) when it's not directly necessary.
-  glBindVertexArray(0);
+	
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT);
+	
+			// draw our first triangle
+    glUseProgram(engine->shaderProgram);
+    glBindVertexArray(
+        engine->VAO); // seeing as we only have a single VAO there's no need to bind it
+              // every time, but we'll do so to keep things a bit more organized
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	eglSwapBuffers(engine->display, engine->surface);
+}
+
+void handle_cmd(android_app *pApp, int32_t cmd) {
+renderer* engine = (renderer*) pApp->userData;	
+  switch (cmd) {
+  case APP_CMD_INIT_WINDOW: {
+   init(engine);
+  } break;
+
+  case APP_CMD_TERM_WINDOW:
+    // TODO :: toffa: clenaup
+    break;
+  }
+}
+
+/**
+ * Process the next input event.
+ */
+static int32_t handle_inputs(struct android_app *app, AInputEvent *event) {
+  return 0;
+}
+
+
+
+void android_main(struct android_app *pApp) {
+	renderer engine;
+	
+	pApp->userData = &engine;
+  pApp->onAppCmd = handle_cmd;
+  pApp->onInputEvent = handle_inputs;
+
+engine.app = pApp;  
+
+LOGW("START NATIVEAPP APPLICATINON");
 
   int events;
   android_poll_source *pSource;
@@ -168,12 +228,6 @@ void android_main(struct android_app *pApp) {
         pSource->process(pApp, pSource);
       }
     }
-    // draw our first triangle
-    glUseProgram(shaderProgram);
-    glBindVertexArray(
-        VAO); // seeing as we only have a single VAO there's no need to bind it
-              // every time, but we'll do so to keep things a bit more organized
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    draw(&engine);
   } while (!pApp->destroyRequested);
 }

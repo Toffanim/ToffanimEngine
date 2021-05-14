@@ -2,8 +2,10 @@
 
 ctime -begin TE.ctm
 
-IF NOT EXIST ..\build mkdir ..\build
-pushd ..\build
+set CURRENT_DIR=%~dp0
+
+IF NOT EXIST %CURRENT_DIR%..\build mkdir %CURRENT_DIR%..\build
+pushd %CURRENT_DIR%..\build
 
 IF %1 == WIN64 (
 
@@ -15,7 +17,7 @@ del *.pdb > NUL 2> NUL
 cl ..\..\src\main.cpp -D_TE_WIN32_ /W4 /nologo /link /SUBSYSTEM:console -incremental:no gdi32.lib opengl32.lib user32.lib kernel32.lib
 
 popd
-goto EOF
+goto end
 )
 
 IF %1 == WEB (
@@ -27,7 +29,7 @@ em++ ..\..\src\main.cpp -o main.html --emrun
 emrun main.html
 
 popd
-goto EOF
+goto end
 )
 
 IF %1 == ANDROID (
@@ -35,13 +37,70 @@ IF %1 == ANDROID (
 IF NOT EXIST ANDROID mkdir ANDROID
 pushd ANDROID
 
-cmake -DANDROID_STL=c++_static -DCMAKE_TOOLCHAIN_FILE=C:/Microsoft/AndroidNDK64/android-ndk-r16b/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DANDROID_ABI=x86_64 ../../src 
+call rm -rf *
+
+IF NOT EXIST jni mkdir jni
+IF NOT EXIST lib mkdir lib\x86_64
+IF NOT EXIST res mkdir res
+
+set ANDROID_SDK=%CURRENT_DIR%..\lib\android_sdk\
+set ANDROID_TOOLS=%ANDROID_SDK%tools\
+set ANDROID_BUILD_TOOLs=%ANDROID_SDK%build-tools\31.0.0-rc3\
+set ANDROID_PLATEFORM_TOOLS=%ANDROID_SDK%platform-tools\
+set ANDROID_CMDLINE_TOOLS=%ANDROID_SDK%cmdline-tools\
+set ANDROID_PLATEFORM=%ANDROID_SDK%platforms\
+set ANDROID_EMULATOR=%ANDROID_SDK%emulator\
+
+set ANDROID_NDK=%ANDROID_SDK%ndk-bundle\
+set ANDROID_NDK_TOOLCHAIN=%ANDROID_NDK%toolchains\
+
+set CC=%ANDROID_NDK_TOOLCHAIN%llvm\prebuilt\windows-x86_64\bin\clang
+set CXX=%ANDROID_NDK_TOOLCHAIN%llvm\prebuilt\windows-x86_64\bin\clang++
+set AR=%ANDROID_NDK_TOOLCHAIN%llvm\prebuilt\windows-x86_64\bin\x86_64-linux-android-ar
+
+set CXX_INCLUDES=%ANDROID_NDK%sources\android\native_app_glue
+set CXX_FLAGS=-D __ANDROID__ -D ANDROID --target=x86_64-linux-android26
+
+REM Create native_glue static library
+call %CC% %CXX_FLAGS% -c %ANDROID_NDK%sources/android/native_app_glue/android_native_app_glue.c -o jni/native_app_glue.o
+call %AR% rcs jni/libnative_app_glue.a jni/native_app_glue.o
+REM Create native library from main
+call %CXX% %CXX_FLAGS% -Wall -I %CXX_INCLUDES% -std=gnu++11 -fPIC -c %CURRENT_DIR%main.cpp -o jni/main.o
+call %CXX% %CXX_FLAGS% -I %CXX_INCLUDES% -u ANativeActivity_onCreate -L jni -shared jni/main.o -o lib/x86_64/libMainNativeActivity.so -llog -landroid -lEGL -lGLESv3  -lnative_app_glue
+REM Create unsigned and unaligned apk
+call %ANDROID_BUILD_TOOLS%aapt2 link -I %ANDROID_PLATEFORM%android-26\android.jar -o MainApp-unaligned-unsigned.apk --manifest %CURRENT_DIR%AndroidManifest.xml
+call echo F|xcopy /R /Y /F %ANDROID_NDK_TOOLCHAIN%llvm\prebuilt\windows-x86_64\sysroot\usr\lib\x86_64-linux-android\libc++_shared.so lib\x86_64\libc++_shared.so
+call %ANDROID_BUILD_TOOLS%aapt add MainApp-unaligned-unsigned.apk lib/x86_64/libc++_shared.so
+call %ANDROID_BUILD_TOOLS%aapt add MainApp-unaligned-unsigned.apk lib/x86_64/libMainNativeActivity.so
+REM Align the apk
+call %ANDROID_BUILD_TOOLS%zipalign -v -p 4 MainApp-unaligned-unsigned.apk MainApp-unsigned.apk
+REM Sign the apk
+call %ANDROID_BUILD_TOOLS%apksigner sign --ks %CURRENT_DIR%ToyKey.keystore --ks-pass pass:armena --out MainApp.apk MainApp-unsigned.apk
+REM Start Emulator
+REM %ANDROID_EMULATOR%emulator -avd testAVD
+REM Deploy application
+call %ANDROID_PLATEFORM_TOOLS%adb uninstall com.MainApp
+call %ANDROID_PLATEFORM_TOOLS%adb install MainApp.apk
+
+REM sdkmanager --install build-tools plateform-tools plateform-android25 ndk-bundle emulator system-images;android-25 extra;intel;hardware_acceleraition....
+REM cmake -DANDROID_STL=c++_static -DCMAKE_TOOLCHAIN_FILE=C:/Microsoft/AndroidNDK64/android-ndk-r16b/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DANDROID_ABI=x86_64 ../../src 
+REM todo : build solution
+REM ..\lib\android_sdk\build-tools\31.0.0-rc3\aapt2 link -I C:\Microsoft\AndroidSDK\25\platforms\android-25\android.jar -o test.apk --manifest AndroidManifest.xml
+
+REM avdmanager create avd --force --name testAVD --abi google_apis/x86_64 --package system-images;android-25;google_apis;x86_64
+REM emulator -avd testAVD
+REM zipalign -v -p 4 ../../../src/test.apk ../../../src/test-aligned.apk
+REM "C:\Program Files\Android\jdk\microsoft_dist_openjdk_1.8.0.25\bin\keytool.exe" -genkeypair -validity 1000 -dname "CN=some company,O=Android,C=JPN" -keystore ToyKey.keystore         -storepass armena -keypass armena -alias NativeActivityKey -keyalg RSA
+REM apksigner sign --ks ToyKey.keystore --out ..\..\..\..\src\test-release.apk ..\..\..\..\src\test
+REM adb install test-release.apk
 
 popd
-goto EOF
+goto end
 )
 
-:EOF
+:end
 popd
+
+set LastError = %ERRORLEVEL%
 
 ctime -end TE.ctm %LastError%
