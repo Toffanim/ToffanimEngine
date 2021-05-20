@@ -10,7 +10,6 @@ void *GetAnyGLFuncAddress(const char *name)
     HMODULE module = LoadLibraryA("opengl32.dll");
     p = (void *)GetProcAddress(module, name);
   }
-  std::cout << "ptr" << p << std::endl;
   return p;
 }
 

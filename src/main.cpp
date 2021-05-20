@@ -374,22 +374,55 @@ int main(int argc, char** argv)
 #endif
 
 //#include "TECore/macros.h"
+
+#include <cstddef>
+
+#define ZeroStruct(Instance) ZeroSize(sizeof(Instance), &(Instance))
+#define ZeroArray(Count, Pointer) ZeroSize((Count)*sizeof((Pointer)[0]), Pointer)
+void
+ZeroSize(size_t Size, void *Ptr)
+{
+    unsigned char *Byte = (unsigned char *)Ptr;
+    while(Size--)
+    {
+        *Byte++ = 0;
+    }
+}
+
+bool gIsRunning = true;
+
 #include "TECore/window.cpp"
 
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
+const char *vertexShaderSource = 
+#if _TE_WIN32_
+"#version 330 core\n"
+#endif
+#if __EMSCRIPTEN__
+"#version 300 es\n"
+#endif
+    "layout (location = 0) in highp vec3 aPos;\n"
     "void main()\n"
     "{\n"
     "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
     "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
+const char *fragmentShaderSource = 
+#if _TE_WIN32_
+"#version 330 core\n"
+#endif
+#if __EMSCRIPTEN__
+"#version 300 es\n"
+#endif
+    "out highp vec4 FragColor;\n"
     "void main()\n"
     "{\n"
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
 
 using namespace TE::Core;
+
+#if _TE_WIN32_
+#include <dsound.h>
+#endif
 
 int main() {
     Window::window MainWindow;
@@ -400,6 +433,87 @@ int main() {
 
     Window::Show(MainWindow.Handle);
 
+#if _TE_WIN32_
+// TODO(toffa): put this in a sound plateform header
+    LPDIRECTSOUND8 lpds; 
+    HRESULT hr = DirectSoundCreate8(NULL, &lpds, NULL);
+    if( FAILED(hr)) std::cout << "FAILED: CreateDS" << std::endl;
+    hr = lpds->SetCooperativeLevel(MainWindow.Handle, DSSCL_PRIORITY);
+    if(FAILED(hr)) std::cout << "FAILED: CoopLvl" << std::endl;
+
+    int SamplesPerSecond = 44100;
+    WAVEFORMATEX WaveFormat = {};
+            WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
+            WaveFormat.nChannels = 2;
+            WaveFormat.nSamplesPerSec = SamplesPerSecond;
+            WaveFormat.wBitsPerSample = 16;
+            WaveFormat.nBlockAlign = (WaveFormat.nChannels*WaveFormat.wBitsPerSample) / 8;
+            WaveFormat.nAvgBytesPerSec = WaveFormat.nSamplesPerSec*WaveFormat.nBlockAlign;
+            WaveFormat.cbSize = 0;
+
+                LPDIRECTSOUNDBUFFER PrimaryBuffer;
+                {
+            DSBUFFERDESC BufferDescription = {};
+                BufferDescription.dwSize = sizeof(BufferDescription);
+                BufferDescription.dwFlags = DSBCAPS_PRIMARYBUFFER;
+                
+                if(DS_OK != lpds->CreateSoundBuffer(&BufferDescription, &PrimaryBuffer, 0))
+                    std::cout << "FAILED: CreatePrimBuf" << std::endl;
+                    PrimaryBuffer->SetFormat(&WaveFormat);
+                }
+
+                    LPDIRECTSOUNDBUFFER SecondaryBuffer;
+{
+                    DSBUFFERDESC BufferDescription = {};
+            BufferDescription.dwSize = sizeof(BufferDescription);
+            BufferDescription.dwFlags = DSBCAPS_GETCURRENTPOSITION2;
+            BufferDescription.dwFlags |= DSBCAPS_GLOBALFOCUS;
+            // TODO(toffa): 3s buffer? should we do static buffers for sound < 10s maybe?
+            BufferDescription.dwBufferBytes = 3 * WaveFormat.nAvgBytesPerSec;
+            BufferDescription.lpwfxFormat = &WaveFormat;
+            if( DS_OK != lpds->CreateSoundBuffer(&BufferDescription, &SecondaryBuffer, 0))
+                std::cout << "FAILED:CreateSecBuf" << std::endl;
+}                   
+HANDLE hFile = CreateFile("test.wav",               // file to open
+                       GENERIC_READ,          // open for reading
+                       FILE_SHARE_READ,       // share for reading
+                       NULL,                  // default security
+                       OPEN_EXISTING,         // existing file only
+                       FILE_ATTRIBUTE_NORMAL, // normal file
+                       NULL); 
+if( INVALID_HANDLE_VALUE == hFile) std::cout << "FAILED: CreateFile" << std::endl;
+DWORD BytesRead;
+DWORD BytesToRead;
+BytesToRead = GetFileSize(hFile, NULL);
+std::cout << BytesToRead << std::endl;
+char* Buffer = new char[BytesToRead];
+std::cout << ReadFile(hFile, Buffer, BytesToRead, &BytesRead, 0) << std::endl;
+std::cout << BytesRead << std::endl;
+// Write all buffer
+// TODO(toffa): update chunk of the buffer to be able to stream longer sounds
+LPVOID lpvWrite;
+DWORD  dwLength;
+if (DS_OK == SecondaryBuffer->Lock(
+      0,          // Offset at which to start lock.
+      0,          // Size of lock; ignored because of flag.
+      &lpvWrite,  // Gets address of first part of lock.
+      &dwLength,  // Gets size of first part of lock.
+      NULL,       // Address of wraparound not needed. 
+      NULL,       // Size of wraparound not needed.
+      DSBLOCK_ENTIREBUFFER))  // Flag.
+{
+  memcpy(lpvWrite, Buffer, dwLength);
+  SecondaryBuffer->Unlock(
+      lpvWrite,   // Address of lock start.
+      dwLength,   // Size of lock.
+      NULL,       // No wraparound portion.
+      0);         // No wraparound size.
+} else {
+    std::cout << "FAILED: LOCK" << std::endl;
+}
+
+    SecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
+#endif
     // build and compile our shader program
     // ------------------------------------
     // vertex shader
@@ -477,20 +591,16 @@ int main() {
     // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0); 
-
-
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-
-
-std::cout << "start message loop" << std::endl;
-    // Run the message loop.
-    MSG msg = { };
-    while (GetMessage(&msg, NULL, 0, 0))
+#if _TE_WIN32_
+    Plateform::input NewInput;
+    for(;;)
     {
-		
-		        // render
+        ZeroStruct(NewInput);
+        GetInputs(NewInput);
+		// render
         // ------
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -502,17 +612,23 @@ std::cout << "start message loop" << std::endl;
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         // glBindVertexArray(0); // no need to unbind it every time 
 		
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-		
 		SwapBuffers(wglGetCurrentDC()); 
+        if(!gIsRunning) break;
     }
+#endif
 
+#if __EMSCRIPTEN__
+    data d;
+    d.shader = shaderProgram;
+    d.VAO = VAO; 
+    emscripten_set_main_loop_arg( mainLoop, &d, 0, true );
+#endif
+    
     // NOTE(toffa): This will kill by shooting the program in the face
     // if we do not do this ( e.g return 0 ) the program is still running somehow but I m not sure this is
     // the best way to do it.
     // TODO(toffa): Is this the best way?
+    #if _TE_WIN32_
     ExitProcess(0);
-    //return 0;
-    
+    #endif
 }

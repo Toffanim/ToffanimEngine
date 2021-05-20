@@ -32,6 +32,8 @@ struct renderer {
 };
 
 void Init(renderer& Renderer, HWND Window) {
+    UNREFERENCED_PARAMETER(Renderer);
+
     PIXELFORMATDESCRIPTOR pfd =
 		{
 			sizeof(PIXELFORMATDESCRIPTOR),

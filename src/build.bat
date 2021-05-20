@@ -14,7 +14,7 @@ pushd WIN64
 
 del *.pdb > NUL 2> NUL
 
-call cl ..\..\src\main.cpp -D_TE_WIN32_ /W4 /nologo /link /SUBSYSTEM:console -incremental:no gdi32.lib opengl32.lib user32.lib kernel32.lib
+call cl ..\..\src\main.cpp -D_TE_WIN32_ /W4 /nologo /link /SUBSYSTEM:console -incremental:no gdi32.lib opengl32.lib user32.lib kernel32.lib dsound.lib
 
 popd
 goto end

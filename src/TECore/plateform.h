@@ -1,5 +1,7 @@
 #pragma once
 
+namespace TE { namespace Core { namespace Plateform {
+
 enum keycode {
     // Mouse
         MouseButton_Left,
@@ -7,7 +9,6 @@ enum keycode {
         MouseButton_Right,
         MouseButton_Extended,
         MouseButton_Extended0,
-
     // Functions : F1-12
         F_1,
         F_2,
@@ -51,6 +52,24 @@ enum keycode {
         ALT_LEFT,
         SHIFT_LEFT,
         CTL_LEFT,
+        TAB,
+        SELECT,
+        PRINT_SCREEN,
+        INSERT,
+        DEL,
+        HOME,
+        END,
+        PAGE_UP,
+        PAGE_DOWN,
+        SPACE,
+        BACKSPACE,
+        ESCAPE,
+        CAPSLOCK,
+
+        ARROW_LEFT,
+        ARROW_RIGHT,
+        ARROW_UP,
+        ARROW_DOWN,
     
     // Letters
         A,
@@ -79,6 +98,20 @@ enum keycode {
         X,
         Y,
         Z,
+
+    // Numbers
+        NUM_0,
+        NUM_1,
+        NUM_2,
+        NUM_3,
+        NUM_4,
+        NUM_5,
+        NUM_6,
+        NUM_7,
+        NUM_8,
+        NUM_9,
+
+        KEYCODE_COUNT,
 };
 
 enum controller_type {
@@ -88,25 +121,31 @@ enum controller_type {
     ControllerType_Count,
 };
 
+struct input_value {
+    union {
+        bool Down;
+        bool Pressed;
+    };
+};
+
 struct controller {
     controller_type Type;
     
+    input_value Keys[KEYCODE_COUNT];
     
+    float MouseX;
+    float MouseY;
 };
 
-enum game_input_mouse_button
-    {
-        
-        PlatformMouseButton_Count,
-    };
-
-constexpr unsigned int MAX_CONTROLLERS_COUNT = 4;
-game_input {
+#define MAX_CONTROLLERS_COUNT 4
+struct input {
     double DeltaTime;
 
-    controller Controllers[MAX_CONTROLLERS_COUNT];
-    mouse Mouse[PlatformMouseButton_Count];
+    controller Controllers[ MAX_CONTROLLERS_COUNT ];
+};
 
-    bool ShiftDown, AltDown, CtlDown;
+void GetInputs( input& Result );
 
+}
+}
 }
