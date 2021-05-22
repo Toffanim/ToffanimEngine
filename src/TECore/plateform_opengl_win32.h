@@ -1,4 +1,18 @@
+#pragma once
+
 #include <gl/gl.h>
+
+namespace TE {namespace Core{ namespace Plateform { struct plateform; }}}
+
+namespace TE {
+namespace Core { 
+namespace Renderer {
+struct renderer {
+  Plateform::plateform* Plateform;
+};
+} // namespace Renderer
+} // namespace Core
+} // namespace TE
 
 void *GetAnyGLFuncAddress(const char *name)
 {

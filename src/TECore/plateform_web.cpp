@@ -1,33 +1,34 @@
-#include <EGL/egl.h>
+#include "plateform_web.h"
+
 #include <iostream>
+#include <stdio.h>
 #include <emscripten.h>
 #include <emscripten/html5.h>
-#include "plateform.h"
 
 #include "plateform_openglES_web.cpp"
 //TODO(mtn5): remove map and implement one?
 #include <unordered_map>
 #include <string>
 
-namespace TE { namespace Core { 
-
+namespace TE { 
+namespace Core { 
 namespace Plateform {
 
-
+namespace {
 std::unordered_map<std::string, keycode> JSCode2Plateform = {
     // Functions
-    {"F1", F1},
-    {"F2", F2},
-    {"F3", F3},
-    {"F4", F4},
-    {"F5", F5},
-    {"F6", F6},
-    {"F7", F7},
-    {"F8", F8},
-    {"F9", F9},
-    {"F10", F10},
-    {"F11", F11},
-    {"F12", F13},
+    {"F1", F_1},
+    {"F2", F_2},
+    {"F3", F_3},
+    {"F4", F_4},
+    {"F5", F_5},
+    {"F6", F_6},
+    {"F7", F_7},
+    {"F8", F_8},
+    {"F9", F_9},
+    {"F10", F_10},
+    {"F11", F_11},
+    {"F12", F_12},
 //Specials
     {"Backspace", BACKSPACE},
     {"Tab", TAB},
@@ -112,92 +113,8 @@ std::unordered_map<std::string, keycode> JSCode2Plateform = {
 
 keycode
 EMScriptenCode2Plateform(  const char* JSCode ) {
-    #if 0
-    // Mouse
-      return MouseButton_Left;
-      case VK_MBUTTON: return MouseButton_Middle;
-      case VK_RBUTTON: return MouseButton_Right;
-      case VK_XBUTTON1: return MouseButton_Extended;
-      case VK_XBUTTON2: return MouseButton_Extended0;
-
-    // Functions : F1-12
-      case VK_F1: return F_1;
-      case VK_F2: return F_2;
-      case VK_F3: return F_3;
-      case VK_F4: return F_4;
-      case VK_F5: return F_5;
-      case VK_F6: return F_6;
-      case VK_F7: return F_7;
-      case VK_F8: return F_8;
-      case VK_F9: return F_9;
-      case VK_F10: return F_10;
-      case VK_F11: return F_11;
-      case VK_F12: return F_12;
-
-    // Numpad
-       case VK_NUMPAD0: return NUMPAD_0;
-       case VK_NUMPAD1: return NUMPAD_1;
-       case VK_NUMPAD2: return NUMPAD_2;
-       case VK_NUMPAD3: return NUMPAD_3;
-       case VK_NUMPAD4: return NUMPAD_4;
-       case VK_NUMPAD5: return NUMPAD_5;
-       case VK_NUMPAD6: return NUMPAD_6;
-       case VK_NUMPAD7: return NUMPAD_7;
-       case VK_NUMPAD8: return NUMPAD_8;
-       case VK_NUMPAD9: return NUMPAD_9;
-
-       case VK_ADD : return NUMPAD_PLUS;
-       case VK_SUBTRACT : return NUMPAD_MINUS;
-       case VK_DIVIDE : return NUMPAD_DIVIDE;
-       case VK_MULTIPLY : return NUMPAD_MULTIPLY;
-       //case VK_? : return NUMPAD_ENTER;
-       case VK_DECIMAL : return NUMPAD_POINT;
-
-       case VK_NUMLOCK: return NUMPAD_NUMLOCK;
-
-    // Sepcial keys
-        case VK_RETURN : return ENTER;
-        // handling of Alt seems different than the rest? VK_Code (1 << 29)
-        case VK_RMENU : return ALT_RIGHT;
-        case VK_RSHIFT : return SHIFT_RIGHT;
-        case VK_RCONTROL : return CTL_RIGHT;
-        case VK_LMENU : return ALT_LEFT;
-        case VK_LSHIFT : return SHIFT_LEFT;
-        case VK_LCONTROL : return CTL_LEFT;
-        case VK_TAB : return TAB;
-        case VK_SELECT : return SELECT;
-        case VK_SNAPSHOT : return PRINT_SCREEN;
-        case VK_INSERT : return INSERT;
-        case VK_DELETE : return DEL;
-        case VK_HOME : return HOME;
-        case VK_END : return END;
-        case VK_PRIOR : return PAGE_UP;
-        case VK_NEXT : return PAGE_DOWN;
-        case VK_SPACE : return SPACE;
-        case VK_BACK : return BACKSPACE;
-        case VK_ESCAPE : return ESCAPE;
-        case VK_CAPITAL : return CAPSLOCK;
-
-        case VK_LEFT : return ARROW_LEFT;
-        case VK_RIGHT : return ARROW_RIGHT;
-        case VK_UP : return ARROW_UP;
-        case VK_DOWN : return ARROW_DOWN;
-    
-    // Numbers
-        case '0': return NUM_0;
-        case '1': return NUM_1;
-        case '2': return NUM_2;
-        case '3': return NUM_3;
-        case '4': return NUM_4;
-        case '5': return NUM_5;
-        case '6': return NUM_6;
-        case '7': return NUM_7;
-        case '8': return NUM_8;
-        case '9': return NUM_9;
-    }
-    #endif
+    // NOTe(toffa):potentially dangerous to return without checking value...
     return JSCode2Plateform[JSCode];
-    //return KEYCODE_COUNT;
 };
 
 
@@ -219,19 +136,85 @@ EM_BOOL keydown_callback(int eventType, const EmscriptenKeyboardEvent *keyEvent,
     return EM_TRUE;
 }
 
+} // namespace
+
+
+void MainLoop( engine& Engine ) {
+    emscripten_set_main_loop_arg( mainLoop, &Engine, 0, true );
 }
+
+void Init(plateform& Plateform) {
+    Window::Init(Plateform.Window, "MainWindow", "SuperDuper title");
+    Audio::Init(Plateform.AudioDevice);
+}
+
+void Exit(int Error) {}
+
+namespace Files {
+    void Create(file&) {}
+    void Open(file& File, const char* Path) {
+        File.Handle = fopen(Path, "r");
+     }
+    void Close(file& File) {
+        fclose(File.Handle);
+    }
+    void ReadAll(file& File, char*& Buffer, size_t& BufferSize) {
+        fseek(File.Handle, 0, SEEK_END);
+        BufferSize = ftell(File.Handle);
+        fseek(File.Handle, 0, SEEK_SET);  /* same as rewind(f); */
+        Buffer = (char*)malloc( (BufferSize + 1) * sizeof(char));
+        fread(Buffer, 1, BufferSize, File.Handle);
+     }
+} // namespace File
+} // namespace Plateform
+
+namespace Audio {
+    void Init(device& Device) {
+        Device.AudioContext = val::global("AudioContext");
+        if (!Device.AudioContext.as<bool>()) {
+          Device.AudioContext = val::global("webkitAudioContext");
+        }
+        Device.Context = Device.AudioContext.new_();
+     }
+    void CreateBuffer(const device& Device, buffer& Buffer) {
+            // Create an empty three-second stereo buffer at the sample rate of the AudioContext
+            Buffer.Handle = Device.Context.call<val>("createBuffer", 2, Device.Context["sampleRate"].as<int>() * 3, Device.Context["sampleRate"].as<int>());
+            Buffer.Context = Device.Context;
+     }                   
+    void UpdateStaticBuffer(buffer& Buffer, char* Data, size_t DataSize) {
+            // Assume that we are always getting back PCM LittleEndian 16bits Interleaved 44.1 2Ch
+            for (int channel = 0; channel < Buffer.Handle["numberOfChannels"].as<int>(); channel++) {
+              // This gives us the actual ArrayBuffer that contains the data
+              val nowBuffering = Buffer.Handle.call<val>("getChannelData", channel);
+              for (int i = 0, j=0; i < Buffer.Handle["length"].as<int>(); i++, j +=4) {
+                // Math.random() is in [0; 1.0]
+                // audio needs to be in [-1.0; 1.0]
+                short PCM16 = (short) (Data[j + (channel*2) ]) | (Data[ (j+1) + (channel*2) ] << 8);
+                float Value = (float)PCM16 / 32767;
+                nowBuffering.set(std::to_string(i), val(Value));
+              }
+            }
+            // Get an AudioBufferSourceNode.
+            // This is the AudioNode to use when we want to play an AudioBuffer
+            Buffer.Source = Buffer.Context.call<val>("createBufferSource");
+            // set the buffer in the AudioBufferSourceNode
+            Buffer.Source.set("buffer", Buffer.Handle);
+            // connect the AudioBufferSourceNode to the
+            // destination so we can hear the sound
+            Buffer.Source.call<void>("connect", Buffer.Context["destination"]);
+     }
+    void Play(const buffer& Buffer) { 
+            // start the source playing
+            Buffer.Source.call<void>("start");
+    }
+} // namespace Audio
     
 namespace Window { 
 
-struct window {
-    EGLDisplay Handle;
-};
-
-void Init( EGLDisplay& Display, const char* Name, const char* Title) {
+void Init( window& Window, const char* Name, const char* Title) {
     // TODO(toffa): can we name the window?
     // Name and Title unused for now on web
-
-    Display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
+    EGLDisplay Display = eglGetDisplay(EGL_DEFAULT_DISPLAY);
 	if ( Display == EGL_NO_DISPLAY )
    {
 	   std::cout << "ERROR: make display\n" << std::endl;
@@ -244,17 +227,17 @@ void Init( EGLDisplay& Display, const char* Name, const char* Title) {
 		return ;
 	}
 
+    Window.Handle = Display;
+
     emscripten_set_keydown_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, Plateform::keydown_callback);
     emscripten_set_keyup_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, nullptr, EM_TRUE, Plateform::keyup_callback);
 }
 
-void Show(EGLDisplay& Display) {
+void Show(window& Display) {
     // TODO(toffa): is it implementable?
    // Not implemented for web as window is always shown? 
 }
 
-}
-
-
-}
-}
+} // namespace Window
+} // namespace COre
+} // namespace TE

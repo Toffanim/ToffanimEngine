@@ -1,6 +1,41 @@
 #pragma once
 
-namespace TE { namespace Core { namespace Plateform {
+#ifdef _TE_WIN32_
+#include "plateform_win32.h"
+#endif
+
+#ifdef __EMSCRIPTEN__
+#include "plateform_web.h"
+#endif
+
+#ifdef __ANDROID__
+#include "plateform_android.h"
+#endif
+
+
+namespace TE {namespace Core {
+    struct engine;
+    namespace Audio {struct device;}
+    namespace Renderer {struct renderer;}
+    namespace Plateform{struct plateform;
+        namespace Files{struct file;}
+    }}}
+
+void te_main_entry(TE::Core::Plateform::plateform& );
+
+namespace TE { 
+namespace Core { 
+namespace Plateform {
+
+void Exit(int);
+void MainLoop(engine&);
+
+namespace Files {
+    void Create(file&, const char*);
+    void Open(file&, const char*);
+    void Close(file&);
+    void ReadAll(file&, char*&, size_t&);
+} // namespace Files
 
 enum keycode {
     // Mouse
@@ -146,6 +181,32 @@ struct input {
 
 void GetInputs( input& Result );
 
-}
-}
-}
+void Init(plateform&);
+
+} // namespace Plateform
+
+namespace Renderer {
+    void Init(renderer&);
+} // namespace Renderer
+
+namespace Audio {
+    void Init(device&);
+    void CreateBuffer(const device&, buffer&);
+    void UpdateStaticBuffer(buffer&, char*, size_t);
+    void Play(const buffer&);
+} // namespace Audio
+
+
+// TODO(toffa): remove this and put it inside the real game file
+struct engine {
+    Plateform::plateform* Plateform;
+    Renderer::renderer* Renderer;
+
+// TODO(toffa): remove me!
+    unsigned int ShaderProgram;
+    unsigned int VAO;
+};
+
+} // namespace Core
+} // namespace TE
+

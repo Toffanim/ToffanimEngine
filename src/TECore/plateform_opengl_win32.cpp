@@ -26,14 +26,11 @@ DECLARE_FUN(PFNGLENABLEVERTEXATTRIBARRAYPROC,glEnableVertexAttribArray)
 DECLARE_FUN(PFNGLCREATEPROGRAMPROC, glCreateProgram)
 DECLARE_FUN(PFNGLUSEPROGRAMPROC, glUseProgram)
 
-namespace TE { namespace Core { namespace Renderer {
+namespace TE {
+namespace Core { 
+namespace Renderer {
 
-struct renderer {
-};
-
-void Init(renderer& Renderer, HWND Window) {
-    UNREFERENCED_PARAMETER(Renderer);
-
+void Init(renderer& Renderer) {
     PIXELFORMATDESCRIPTOR pfd =
 		{
 			sizeof(PIXELFORMATDESCRIPTOR),
@@ -54,7 +51,7 @@ void Init(renderer& Renderer, HWND Window) {
 			0, 0, 0
 		};
 
-		HDC DC = GetDC(Window);
+		HDC DC = GetDC(Renderer.Plateform->Window.Handle);
 
 // TODO (Toffa) : use a more advanced strategy to chose PF
 		int PF = ChoosePixelFormat(DC, &pfd); 
@@ -84,6 +81,6 @@ GET_FUN(PFNGLCREATEPROGRAMPROC, glCreateProgram)
 GET_FUN(PFNGLUSEPROGRAMPROC, glUseProgram)
 }
 
-}
-}
-}
+} // namespace Renderer
+} // namespace Core
+} // namespace TE

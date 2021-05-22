@@ -373,8 +373,6 @@ int main(int argc, char** argv)
 
 #endif
 
-//#include "TECore/macros.h"
-
 #include <cstddef>
 
 #define ZeroStruct(Instance) ZeroSize(sizeof(Instance), &(Instance))
@@ -390,14 +388,13 @@ ZeroSize(size_t Size, void *Ptr)
 }
 
 bool gIsRunning = true;
-
-#include "TECore/window.cpp"
+bool gIsWindowAvailable = false;
 
 const char *vertexShaderSource = 
 #if _TE_WIN32_
 "#version 330 core\n"
 #endif
-#if __EMSCRIPTEN__
+#if __EMSCRIPTEN__ || __ANDROID__
 "#version 300 es\n"
 #endif
     "layout (location = 0) in highp vec3 aPos;\n"
@@ -409,7 +406,7 @@ const char *fragmentShaderSource =
 #if _TE_WIN32_
 "#version 330 core\n"
 #endif
-#if __EMSCRIPTEN__
+#if __EMSCRIPTEN__ || __ANDROID__
 "#version 300 es\n"
 #endif
     "out highp vec4 FragColor;\n"
@@ -418,217 +415,124 @@ const char *fragmentShaderSource =
     "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
     "}\n\0";
 
+
+#include "TECore/plateform.cpp"
+#include "TECore/window.cpp"
+
 using namespace TE::Core;
 
-#if _TE_WIN32_
-#include <dsound.h>
-#endif
+void CreateData(engine& Engine) {
+        // build and compile our shader program
+        // ------------------------------------
+        // vertex shader
+        unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+        glCompileShader(vertexShader);
+        // check for shader compile errors
+        int success;
+        char infoLog[512];
+        glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+        }
+        // fragment shader
+        unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+        glCompileShader(fragmentShader);
+        // check for shader compile errors
+        glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+        if (!success)
+        {
+            glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+        }
+        // link shaders
+        unsigned int shaderProgram = glCreateProgram();
+        glAttachShader(shaderProgram, vertexShader);
+        glAttachShader(shaderProgram, fragmentShader);
+        glLinkProgram(shaderProgram);
+        // check for linking errors
+        glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+        if (!success) {
+            glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+            std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+        }
+        glDeleteShader(vertexShader);
+        glDeleteShader(fragmentShader);
 
-int main() {
-    Window::window MainWindow;
-    Window::Init(MainWindow.Handle, "MainWindow", "SuperDuper title");
-    
-    Renderer::renderer MainRenderer;
-    Renderer::Init(MainRenderer, MainWindow.Handle);
+        // set up vertex data (and buffer(s)) and configure vertex attributes
+        // ------------------------------------------------------------------
+        float vertices[] = {
+             0.5f,  0.5f, 0.0f,  // top right
+             0.5f, -0.5f, 0.0f,  // bottom right
+            -0.5f, -0.5f, 0.0f,  // bottom left
+            -0.5f,  0.5f, 0.0f   // top left 
+        };
+        unsigned int indices[] = {  // note that we start from 0!
+            0, 1, 3,  // first Triangle
+            1, 2, 3   // second Triangle
+        };
+        unsigned int VBO, VAO, EBO;
+        glGenVertexArrays(1, &VAO);
+        glGenBuffers(1, &VBO);
+        glGenBuffers(1, &EBO);
+        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+        glBindVertexArray(VAO);
 
-    Window::Show(MainWindow.Handle);
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-#if _TE_WIN32_
-// TODO(toffa): put this in a sound plateform header
-    LPDIRECTSOUND8 lpds; 
-    HRESULT hr = DirectSoundCreate8(NULL, &lpds, NULL);
-    if( FAILED(hr)) std::cout << "FAILED: CreateDS" << std::endl;
-    hr = lpds->SetCooperativeLevel(MainWindow.Handle, DSSCL_PRIORITY);
-    if(FAILED(hr)) std::cout << "FAILED: CoopLvl" << std::endl;
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    int SamplesPerSecond = 44100;
-    WAVEFORMATEX WaveFormat = {};
-            WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
-            WaveFormat.nChannels = 2;
-            WaveFormat.nSamplesPerSec = SamplesPerSecond;
-            WaveFormat.wBitsPerSample = 16;
-            WaveFormat.nBlockAlign = (WaveFormat.nChannels*WaveFormat.wBitsPerSample) / 8;
-            WaveFormat.nAvgBytesPerSec = WaveFormat.nSamplesPerSec*WaveFormat.nBlockAlign;
-            WaveFormat.cbSize = 0;
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glEnableVertexAttribArray(0);
 
-                LPDIRECTSOUNDBUFFER PrimaryBuffer;
-                {
-            DSBUFFERDESC BufferDescription = {};
-                BufferDescription.dwSize = sizeof(BufferDescription);
-                BufferDescription.dwFlags = DSBCAPS_PRIMARYBUFFER;
-                
-                if(DS_OK != lpds->CreateSoundBuffer(&BufferDescription, &PrimaryBuffer, 0))
-                    std::cout << "FAILED: CreatePrimBuf" << std::endl;
-                    PrimaryBuffer->SetFormat(&WaveFormat);
-                }
+        // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+        glBindBuffer(GL_ARRAY_BUFFER, 0); 
 
-                    LPDIRECTSOUNDBUFFER SecondaryBuffer;
-{
-                    DSBUFFERDESC BufferDescription = {};
-            BufferDescription.dwSize = sizeof(BufferDescription);
-            BufferDescription.dwFlags = DSBCAPS_GETCURRENTPOSITION2;
-            BufferDescription.dwFlags |= DSBCAPS_GLOBALFOCUS;
-            // TODO(toffa): 3s buffer? should we do static buffers for sound < 10s maybe?
-            BufferDescription.dwBufferBytes = 3 * WaveFormat.nAvgBytesPerSec;
-            BufferDescription.lpwfxFormat = &WaveFormat;
-            if( DS_OK != lpds->CreateSoundBuffer(&BufferDescription, &SecondaryBuffer, 0))
-                std::cout << "FAILED:CreateSecBuf" << std::endl;
-}                   
-HANDLE hFile = CreateFile("test.wav",               // file to open
-                       GENERIC_READ,          // open for reading
-                       FILE_SHARE_READ,       // share for reading
-                       NULL,                  // default security
-                       OPEN_EXISTING,         // existing file only
-                       FILE_ATTRIBUTE_NORMAL, // normal file
-                       NULL); 
-if( INVALID_HANDLE_VALUE == hFile) std::cout << "FAILED: CreateFile" << std::endl;
-DWORD BytesRead;
-DWORD BytesToRead;
-BytesToRead = GetFileSize(hFile, NULL);
-std::cout << BytesToRead << std::endl;
-char* Buffer = new char[BytesToRead];
-std::cout << ReadFile(hFile, Buffer, BytesToRead, &BytesRead, 0) << std::endl;
-std::cout << BytesRead << std::endl;
-// Write all buffer
-// TODO(toffa): update chunk of the buffer to be able to stream longer sounds
-LPVOID lpvWrite;
-DWORD  dwLength;
-if (DS_OK == SecondaryBuffer->Lock(
-      0,          // Offset at which to start lock.
-      0,          // Size of lock; ignored because of flag.
-      &lpvWrite,  // Gets address of first part of lock.
-      &dwLength,  // Gets size of first part of lock.
-      NULL,       // Address of wraparound not needed. 
-      NULL,       // Size of wraparound not needed.
-      DSBLOCK_ENTIREBUFFER))  // Flag.
-{
-  memcpy(lpvWrite, Buffer, dwLength);
-  SecondaryBuffer->Unlock(
-      lpvWrite,   // Address of lock start.
-      dwLength,   // Size of lock.
-      NULL,       // No wraparound portion.
-      0);         // No wraparound size.
-} else {
-    std::cout << "FAILED: LOCK" << std::endl;
+        // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+        // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
+        // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
+        glBindVertexArray(0); 
+        // uncomment this call to draw in wireframe polygons.
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        Engine.ShaderProgram = shaderProgram;
+        Engine.VAO = VAO;
 }
 
-    SecondaryBuffer->Play(0, 0, DSBPLAY_LOOPING);
-#endif
-    // build and compile our shader program
-    // ------------------------------------
-    // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+TE_MAIN() {
+    // Init renderer
+    // TODO(toffa): give access to enums to be able to set up renderer correctly
+    // aka BitDepth, if any stencil, if sRGB, etc
+    Renderer::renderer MainRenderer = {};
+    MainRenderer.Plateform = &CurrentPlateform;
+    Renderer::Init(MainRenderer);
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
-    };
-    unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
-    unsigned int VBO, VAO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray(VAO);
+    Window::Show(CurrentPlateform.Window);
 
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    Audio::buffer SecondaryBuffer = {};
+    Audio::CreateBuffer(CurrentPlateform.AudioDevice, SecondaryBuffer);
+    Plateform::Files::file WAVFile;
+    Plateform::Files::Open(WAVFile, "test.wav");
+    char* WAVFileData = nullptr;
+    size_t WAVFileSize = 0;
+    Plateform::Files::ReadAll(WAVFile, WAVFileData, WAVFileSize);
+    Audio::UpdateStaticBuffer(SecondaryBuffer, WAVFileData, WAVFileSize);
+    Audio::Play(SecondaryBuffer);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    engine Engine = {};
+    Engine.Plateform = &CurrentPlateform;
+    Engine.Renderer = &MainRenderer;
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
+    CreateData(Engine);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0); 
+    Plateform::MainLoop( Engine );
 
-    // remember: do NOT unbind the EBO while a VAO is active as the bound element buffer object IS stored in the VAO; keep the EBO bound.
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
-    glBindVertexArray(0); 
-    // uncomment this call to draw in wireframe polygons.
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-#if _TE_WIN32_
-    Plateform::input NewInput;
-    for(;;)
-    {
-        ZeroStruct(NewInput);
-        GetInputs(NewInput);
-		// render
-        // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        // draw our first triangle
-        glUseProgram(shaderProgram);
-        glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        // glBindVertexArray(0); // no need to unbind it every time 
-		
-		SwapBuffers(wglGetCurrentDC()); 
-        if(!gIsRunning) break;
-    }
-#endif
-
-#if __EMSCRIPTEN__
-    data d;
-    d.shader = shaderProgram;
-    d.VAO = VAO; 
-    emscripten_set_main_loop_arg( mainLoop, &d, 0, true );
-#endif
-    
-    // NOTE(toffa): This will kill by shooting the program in the face
-    // if we do not do this ( e.g return 0 ) the program is still running somehow but I m not sure this is
-    // the best way to do it.
-    // TODO(toffa): Is this the best way?
-    #if _TE_WIN32_
-    ExitProcess(0);
-    #endif
+    Plateform::Exit(0);
 }

@@ -5,13 +5,9 @@
 #include "plateform.h"
 #include "plateform_opengl_win32.cpp"
 
-namespace TE { namespace Core { namespace Window { 
-
-    struct window {
-        HWND Handle;
-    };
-
-
+namespace TE { 
+namespace Core { 
+namespace Window { 
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -33,7 +29,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void Init( HWND& Window , const char* Name, const char* Title) {
+void Init( window& Window , const char* Name, const char* Title) {
 	HINSTANCE hInstance = GetModuleHandle(0);	
 	// Register the window class.    
     WNDCLASS wc = { };
@@ -45,7 +41,7 @@ void Init( HWND& Window , const char* Name, const char* Title) {
     RegisterClass(&wc);
 
     // Create the window.
-    Window = CreateWindowExA(
+    Window.Handle = CreateWindowExA(
         0,                              // Optional window styles.
         Name,                     // Window class
         Title,    // Window text
@@ -61,13 +57,38 @@ void Init( HWND& Window , const char* Name, const char* Title) {
         );
 }
 
-void Show(HWND Window) {
-    ShowWindow(Window, SW_SHOW);
+void Show(window& Window) {
+    ShowWindow(Window.Handle, SW_SHOW);
 }
 
 } // namespace Window
 
 namespace Plateform {
+    void Exit(int Error) {
+        ExitProcess(Error);
+    }
+
+    void MainLoop(engine& Engine) {
+        Plateform::input NewInput;
+        for(;;)
+        {
+            ZeroStruct(NewInput);
+            GetInputs(NewInput);
+
+            glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            // draw our first triangle
+            glUseProgram(Engine.ShaderProgram);
+            glBindVertexArray(Engine.VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+            //glDrawArrays(GL_TRIANGLES, 0, 6);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            // glBindVertexArray(0); // no need to unbind it every time 
+		
+		    SwapBuffers(wglGetCurrentDC()); 
+            if(!gIsRunning) break;
+        }
+    }
 
 keycode
 VKCode2Plateform( unsigned int VKCode ) {
@@ -230,6 +251,114 @@ void GetInputs(input& Result) {
     Result.Controllers[0].MouseY = MouseP.y;
 }
 
+void Init(plateform& Plateform) {
+    Window::Init(Plateform.Window, "MainWindow", "SuperDuper title");
+    Audio::Init(Plateform.AudioDevice);
 }
-}
-}
+
+namespace Files {
+    void Create(file&) {}
+    void Open(file& File, const char* Path) {
+        HANDLE hFile = CreateFile(Path,               // file to open
+                                  GENERIC_READ,          // open for reading
+                                  FILE_SHARE_READ,       // share for reading
+                                  NULL,                  // default security
+                                  OPEN_EXISTING,         // existing file only
+                                  FILE_ATTRIBUTE_NORMAL, // normal file
+                                  NULL); 
+        if( INVALID_HANDLE_VALUE == hFile) std::cout << "FAILED: CreateFile" << std::endl;
+        File.Handle = hFile;
+    }
+    void Close(file& File) {}
+    void ReadAll(file& File, char*& Buffer, size_t& BufferSize) {
+        DWORD BytesRead;
+        DWORD BytesToRead;
+        BytesToRead = GetFileSize(File.Handle, NULL);
+        Buffer = new char[BytesToRead];
+        ReadFile(File.Handle, Buffer, BytesToRead, &BytesRead, 0);
+        BufferSize = BytesRead;
+    }
+} // namespace Files
+
+} // namespace Plateform
+namespace Audio {
+    void Init(device& Device) {
+        LPDIRECTSOUND8 lpds; 
+        HRESULT hr = DirectSoundCreate8(NULL, &lpds, NULL);
+        if( FAILED(hr)) std::cout << "FAILED: CreateDS" << std::endl;
+        hr = lpds->SetCooperativeLevel(GetActiveWindow(), DSSCL_PRIORITY);
+        if(FAILED(hr)) std::cout << "FAILED: CoopLvl" << std::endl;
+
+        Device.Handle = lpds;
+
+        DSBUFFERDESC BufferDescription = {};
+        BufferDescription.dwSize = sizeof(BufferDescription);
+        BufferDescription.dwFlags = DSBCAPS_PRIMARYBUFFER;
+                
+        if(DS_OK != Device.Handle->CreateSoundBuffer(&BufferDescription, &(Device.PrimaryBuffer.Handle), 0))
+           std::cout << "FAILED: CreatePrimBuf" << std::endl;
+
+            WAVEFORMATEX WaveFormat = {};
+            WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
+            WaveFormat.nChannels = 2;
+            WaveFormat.nSamplesPerSec = 48000;
+            WaveFormat.wBitsPerSample = 16;
+            WaveFormat.nBlockAlign = (WaveFormat.nChannels*WaveFormat.wBitsPerSample) / 8;
+            WaveFormat.nAvgBytesPerSec = WaveFormat.nSamplesPerSec*WaveFormat.nBlockAlign;
+            WaveFormat.cbSize = 0;
+
+           Device.PrimaryBuffer.Handle->SetFormat(&WaveFormat);
+        }
+
+    void CreateBuffer(const device& Device, buffer& Buffer) {
+        LPDIRECTSOUNDBUFFER SecondaryBuffer;
+        DSBUFFERDESC BufferDescription = {};
+        BufferDescription.dwSize = sizeof(BufferDescription);
+        BufferDescription.dwFlags = DSBCAPS_GETCURRENTPOSITION2;
+        BufferDescription.dwFlags |= DSBCAPS_GLOBALFOCUS;
+            WAVEFORMATEX WaveFormat = {};
+            WaveFormat.wFormatTag = WAVE_FORMAT_PCM;
+            WaveFormat.nChannels = 2;
+            WaveFormat.nSamplesPerSec = 48000;
+            WaveFormat.wBitsPerSample = 16;
+            WaveFormat.nBlockAlign = (WaveFormat.nChannels*WaveFormat.wBitsPerSample) / 8;
+            WaveFormat.nAvgBytesPerSec = WaveFormat.nSamplesPerSec*WaveFormat.nBlockAlign;
+            WaveFormat.cbSize = 0;
+        // TODO(toffa): 3s buffer? should we do static buffers for sound < 10s maybe?
+        BufferDescription.dwBufferBytes = 3 * WaveFormat.nAvgBytesPerSec;
+        BufferDescription.lpwfxFormat = &WaveFormat;
+        if( DS_OK != Device.Handle->CreateSoundBuffer(&BufferDescription, &SecondaryBuffer, 0))
+                std::cout << "FAILED:CreateSecBuf" << std::endl;
+        Buffer.Handle = SecondaryBuffer;
+    }                   
+
+
+    void UpdateStaticBuffer(buffer& Buffer, char* Data, size_t DataSize) {
+        LPVOID lpvWrite;
+        DWORD  dwLength;
+        if (DS_OK == Buffer.Handle->Lock(
+              0,          // Offset at which to start lock.
+              0,          // Size of lock; ignored because of flag.
+              &lpvWrite,  // Gets address of first part of lock.
+              &dwLength,  // Gets size of first part of lock.
+              NULL,       // Address of wraparound not needed. 
+              NULL,       // Size of wraparound not needed.
+              DSBLOCK_ENTIREBUFFER))  // Flag.
+        {
+          memcpy(lpvWrite, Data, DataSize);
+          Buffer.Handle->Unlock(
+              lpvWrite,   // Address of lock start.
+              dwLength,   // Size of lock.
+              NULL,       // No wraparound portion.
+              0);         // No wraparound size.
+        } else {
+            std::cout << "FAILED: LOCK" << std::endl;
+        }
+    }
+
+    void Play(const buffer& Buffer) {
+        Buffer.Handle->Play(0,0,DSBPLAY_LOOPING);
+    }
+} // namespace Audio
+} // namespace Core
+} // namespace TE

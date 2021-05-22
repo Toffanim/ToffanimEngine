@@ -1,19 +1,18 @@
+#include "plateform_openglES_web.h"
+
 #include <GLES3/gl3.h>
 #include <EGL/egl.h>
 #include <iostream>
 
-	struct data {
-		GLuint shader;
-		GLuint VAO;
-	};
-	
+#include "plateform_web.h"
+
 void mainLoop(void* userData) {
 	    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-data* d = (data*)userData;
+        TE::Core::engine* d = (TE::Core::engine*)userData;
        // draw our first triangle
-        glUseProgram(d->shader);
+        glUseProgram(d->ShaderProgram);
         glBindVertexArray(d->VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -22,10 +21,8 @@ data* d = (data*)userData;
 
 namespace TE { namespace Core { namespace Renderer {
 
-struct renderer {
-};
-
-void Init(renderer& Renderer, EGLDisplay& Display) {
+void Init(renderer& Renderer) {
+    Renderer.Display = Renderer.Plateform->Window.Handle;
 // TODO(toffa) : choose the right configuration
 	EGLint const attrib_list[] = {
         EGL_RED_SIZE, 4,
@@ -37,7 +34,7 @@ void Init(renderer& Renderer, EGLDisplay& Display) {
 	EGLConfig config;
 	EGLint config_size = 1;
 	EGLint num_config;
-	if( ! eglChooseConfig(Display,
+	if( ! eglChooseConfig(Renderer.Display,
 			attrib_list,
 		    &config,
 		    config_size,
@@ -47,7 +44,7 @@ void Init(renderer& Renderer, EGLDisplay& Display) {
 			}
 		
 		
-	EGLSurface Surface = eglCreateWindowSurface(	Display,
+	EGLSurface Surface = eglCreateWindowSurface(	Renderer.Display,
  	                                                config,
  	                                                0,
  	                                                0);
@@ -63,7 +60,7 @@ void Init(renderer& Renderer, EGLDisplay& Display) {
 	};
 
 
-    EGLContext Context = eglCreateContext(	Display,
+    EGLContext Context = eglCreateContext(	Renderer.Display,
  	                                        config,
  	                                        EGL_NO_CONTEXT,
  	                                        attrib_list_context);
@@ -75,13 +72,15 @@ void Init(renderer& Renderer, EGLDisplay& Display) {
    }   
 											
 
-    if( !eglMakeCurrent(	Display,
+    if( !eglMakeCurrent(	Renderer.Display,
  	                    Surface,
 						Surface,
 						Context)) {
 							std::cout << "ERROR: make current\n" << std::endl;
 						return ;
 						}
+	Renderer.Surface = Surface;
+	Renderer.Context = Context;
 }
 						
 
