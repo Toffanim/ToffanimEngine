@@ -174,24 +174,34 @@ namespace Audio {
         if (!Device.AudioContext.as<bool>()) {
           Device.AudioContext = val::global("webkitAudioContext");
         }
-        Device.Context = Device.AudioContext.new_();
+        val V = val::object();
+        V.set("sampleRate", 44100);
+        Device.Context = Device.AudioContext.new_(V);
      }
     void CreateBuffer(const device& Device, buffer& Buffer) {
             // Create an empty three-second stereo buffer at the sample rate of the AudioContext
-            Buffer.Handle = Device.Context.call<val>("createBuffer", 2, Device.Context["sampleRate"].as<int>() * 3, Device.Context["sampleRate"].as<int>());
+            Buffer.Handle = Device.Context.call<val>("createBuffer", 2, Device.Context["sampleRate"].as<int>() * 4, Device.Context["sampleRate"].as<int>());
             Buffer.Context = Device.Context;
      }                   
     void UpdateStaticBuffer(buffer& Buffer, char* Data, size_t DataSize) {
             // Assume that we are always getting back PCM LittleEndian 16bits Interleaved 44.1 2Ch
+            // TODO (toffa): Actually decode WAV RIFF Header? Honestly we will probably compress the audio
+            // ourselves, so we are probably safe to hard encode the input stream constraints
+            int chunkSize = Data[40] | Data[41] << 8 | Data[42] << 16 | Data[43] << 24;
+            int chunkOffset = 44;
             for (int channel = 0; channel < Buffer.Handle["numberOfChannels"].as<int>(); channel++) {
               // This gives us the actual ArrayBuffer that contains the data
               val nowBuffering = Buffer.Handle.call<val>("getChannelData", channel);
-              for (int i = 0, j=0; i < Buffer.Handle["length"].as<int>(); i++, j +=4) {
-                // Math.random() is in [0; 1.0]
+              for (int i = chunkOffset, j =0; i < chunkSize; i+=4, j++) {
                 // audio needs to be in [-1.0; 1.0]
-                short PCM16 = (short) (Data[j + (channel*2) ]) | (Data[ (j+1) + (channel*2) ] << 8);
-                float Value = (float)PCM16 / 32767;
-                nowBuffering.set(std::to_string(i), val(Value));
+                // note: valmin does not carry the sign -, as it will be carried by value
+                const float valMin = /*-*/32768;
+                const float valMax = 32767;
+                char offset = (channel*2);
+                float PCM16 = Data[i + offset ] | (Data[ (i+1) + offset ] << 8);
+                float Value = PCM16 / ((PCM16<0)?valMin:valMax);
+                if( j < nowBuffering["length"].as<int>() )
+                    nowBuffering.set(std::to_string(j), val(Value));
               }
             }
             // Get an AudioBufferSourceNode.
@@ -202,6 +212,7 @@ namespace Audio {
             // connect the AudioBufferSourceNode to the
             // destination so we can hear the sound
             Buffer.Source.call<void>("connect", Buffer.Context["destination"]);
+            Buffer.Source.set("loop", val(true));
      }
     void Play(const buffer& Buffer) { 
             // start the source playing
