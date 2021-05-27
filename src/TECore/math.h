@@ -12,6 +12,8 @@
 #if !defined(MATH_H)
 #define MATH_H
 
+#if 0
+
 #include "glm/glm.hpp"
 #include "glm/gtc/matrix_transform.hpp"
 #include <math.h>
@@ -152,5 +154,31 @@ namespace TE
 		}
 	}
 }
+#endif
+
+namespace TE {
+	namespace Core {
+		namespace Math {
+			struct vec2f {
+                union {
+                    float x;
+					float r;
+					float w;
+					float width;
+				};
+
+				union {
+					float y;
+					float g;
+					float h;
+					float height;
+				}
+			};
+		}
+	}
+}
+
 
 #endif
+
+

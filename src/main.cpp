@@ -532,6 +532,18 @@ TE_MAIN() {
 
     CreateData(Engine);
 
+    world MainWorld;
+    MainWorld.RegisterComponent(position);
+
+    unsigned int MaxEntities = 500;
+    for (int i{0}; i < 500; ++i) {
+        auto E = MainWorld.Entitites.Create();
+        MainWorld.Entitites.AddComponent(E, "position");
+    }
+
+    World.Update();
+    
+    
     Plateform::MainLoop( Engine );
 
     Plateform::Exit(0);
